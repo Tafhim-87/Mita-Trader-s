@@ -47,7 +47,6 @@ export async function PATCH(request, { params }) {
   try {
     await connectDB();
     
-    // Await params
     const { id } = await params;
 
     if (!isValidObjectId(id)) {
@@ -58,6 +57,25 @@ export async function PATCH(request, { params }) {
     }
 
     const updates = await request.json();
+
+    // ===== Best Of Month limit check =====
+    if (updates.bestOfMonth === true) {
+
+      const count = await Book.countDocuments({
+        bestOfMonth: true,
+        _id: { $ne: id }
+      });
+
+      if (count >= 5) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Maximum 5 Best Of Month books allowed'
+          },
+          { status: 400 }
+        );
+      }
+    }
 
     const book = await Book.findByIdAndUpdate(
       id,
@@ -80,25 +98,22 @@ export async function PATCH(request, { params }) {
     
   } catch (error) {
     console.error('Update book error:', error);
-    
+
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => err.message);
       return NextResponse.json(
-        { 
-          success: false, 
-          message: 'Validation failed',
-          errors 
-        },
+        { success: false, message: 'Validation failed', errors },
         { status: 400 }
       );
     }
-    
+
     return NextResponse.json(
       { success: false, message: 'Update failed', error: error.message },
       { status: 400 }
     );
   }
 }
+
 
 // DELETE - Delete a book
 export async function DELETE(request, { params }) {
@@ -157,7 +172,6 @@ export async function PUT(request, { params }) {
   try {
     await connectDB();
     
-    // Await params
     const { id } = await params;
 
     if (!isValidObjectId(id)) {
@@ -169,7 +183,6 @@ export async function PUT(request, { params }) {
 
     const bookData = await request.json();
 
-    // Find book first
     const existingBook = await Book.findById(id);
     
     if (!existingBook) {
@@ -179,7 +192,25 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // Update book
+    // ===== Best Of Month limit check =====
+    if (bookData.bestOfMonth === true) {
+
+      const count = await Book.countDocuments({
+        bestOfMonth: true,
+        _id: { $ne: id }
+      });
+
+      if (count >= 5) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Maximum 5 Best Of Month books allowed'
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     Object.keys(bookData).forEach(key => {
       existingBook[key] = bookData[key];
     });
@@ -191,9 +222,10 @@ export async function PUT(request, { params }) {
       message: 'Book updated successfully',
       data: existingBook,
     });
-    
+
   } catch (error) {
     console.error('PUT error:', error);
+
     return NextResponse.json(
       { success: false, message: 'Update failed', error: error.message },
       { status: 400 }

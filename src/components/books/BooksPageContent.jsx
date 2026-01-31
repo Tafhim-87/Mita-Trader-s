@@ -19,7 +19,6 @@ import {
   Clock,
   Check,
   RefreshCw,
-  ShoppingBag,
   Loader2,
   Tag,
   Award,
@@ -57,7 +56,7 @@ export default function BooksPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // State for filters
+  // Initialize state from URL
   const [filters, setFilters] = useState({
     page: 1,
     limit: 12,
@@ -90,68 +89,82 @@ export default function BooksPageContent() {
     }
   );
 
-  // Fetch books with filters
-  const { data: booksData, isLoading, isError, refetch } = useBooks(filters);
-
-  const books = booksData?.data || [];
-  const pagination = booksData?.pagination || {};
-
-  // Initialize filters from URL
+  // Parse URL on mount
   useEffect(() => {
-    const params = {};
+    const params = {
+      page: 1,
+      limit: 12,
+      search: "",
+      category: [],
+      minPrice: "",
+      maxPrice: "",
+      minRating: "",
+      sortBy: "createdAt",
+      order: "desc",
+      featured: false,
+      bestseller: false,
+    };
 
+    // Parse URL parameters
     searchParams.forEach((value, key) => {
       if (key === "category") {
-        params[key] = value.split(",");
-      } else if (key === "page" || key === "limit" || key === "minRating") {
+        params[key] = value.split(",").filter(Boolean);
+      } else if (key === "page" || key === "limit") {
         const num = parseInt(value);
-        params[key] = isNaN(num) ? "" : num;
+        if (!isNaN(num)) params[key] = num;
       } else if (key === "minPrice" || key === "maxPrice") {
         const num = parseFloat(value);
-        params[key] = isNaN(num) ? "" : num;
+        if (!isNaN(num)) params[key] = num.toString();
+      } else if (key === "minRating") {
+        const num = parseFloat(value);
+        if (!isNaN(num)) params[key] = num.toString();
+      } else if (key === "sortBy") {
+        params[key] = value;
+      } else if (key === "order") {
+        params[key] = value;
       } else if (key === "featured" || key === "bestseller") {
         params[key] = value === "true";
-      } else {
+      } else if (key === "search") {
         params[key] = value;
       }
     });
 
-    setFilters((prev) => ({ ...prev, ...params }));
+    setFilters(params);
   }, [searchParams]);
 
   // Update URL when filters change
-  const updateURL = useCallback(
-    (newFilters) => {
-      const params = new URLSearchParams();
+  const updateURL = useCallback((newFilters) => {
+    const params = new URLSearchParams();
+    
+    // Only add non-default values to URL
+    if (newFilters.search) params.set("search", newFilters.search);
+    if (newFilters.category.length > 0) params.set("category", newFilters.category.join(","));
+    if (newFilters.minPrice) params.set("minPrice", newFilters.minPrice.toString());
+    if (newFilters.maxPrice) params.set("maxPrice", newFilters.maxPrice.toString());
+    if (newFilters.minRating) params.set("minRating", newFilters.minRating.toString());
+    if (newFilters.sortBy !== "createdAt") params.set("sortBy", newFilters.sortBy);
+    if (newFilters.order !== "desc") params.set("order", newFilters.order);
+    if (newFilters.featured) params.set("featured", "true");
+    if (newFilters.bestseller) params.set("bestseller", "true");
+    if (newFilters.page > 1) params.set("page", newFilters.page.toString());
+    if (newFilters.limit !== 12) params.set("limit", newFilters.limit.toString());
 
-      Object.entries(newFilters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== "") {
-          if (Array.isArray(value)) {
-            if (value.length > 0) {
-              params.append(key, value.join(","));
-            }
-          } else if (typeof value === "boolean") {
-            if (value) params.append(key, "true");
-          } else {
-            params.append(key, value.toString());
-          }
-        }
-      });
-
-      const url = `/books?${params.toString()}`;
-      router.push(url, { scroll: false });
-    },
-    [router]
-  );
+    const url = `/books?${params.toString()}`;
+    router.push(url, { scroll: false });
+  }, [router]);
 
   // Handle filter changes
-  const handleFilterChange = (key, value) => {
-  setFilters((prev) => ({
-    ...prev,
-    [key]: value === "" ? "" : Number(value),
-  }));
-};
-
+  const handleFilterChange = useCallback((key, value) => {
+    setFilters(prev => {
+      const newFilters = {
+        ...prev,
+        [key]: value,
+        page: 1 // Reset to first page when filters change
+      };
+      updateURL(newFilters);
+      return newFilters;
+    });
+  }, [updateURL]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -159,24 +172,21 @@ export default function BooksPageContent() {
   };
 
   const toggleCategory = (categoryName) => {
-    const currentCategories = Array.isArray(filters.category)
-      ? filters.category
-      : [];
-    const newCategories = currentCategories.includes(categoryName)
-      ? currentCategories.filter((cat) => cat !== categoryName)
-      : [...currentCategories, categoryName];
-
+    const newCategories = filters.category.includes(categoryName)
+      ? filters.category.filter(cat => cat !== categoryName)
+      : [...filters.category, categoryName];
+    
     handleFilterChange("category", newCategories);
   };
 
   const handlePriceRange = (min, max) => {
     const newFilters = {
       ...filters,
-      minPrice: min,
-      maxPrice: max,
+      minPrice: min.toString(),
+      maxPrice: max.toString(),
       page: 1,
     };
-
+    
     setFilters(newFilters);
     updateURL(newFilters);
   };
@@ -195,136 +205,118 @@ export default function BooksPageContent() {
       featured: false,
       bestseller: false,
     };
-
+    
     setFilters(defaultFilters);
     updateURL(defaultFilters);
   };
 
   const toggleSection = (section) => {
-    setExpandedSections((prev) => ({
+    setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section],
     }));
   };
 
-  // BookCard Component
-  // In the same BooksPage component, update the BookCard component
-  const BookCard = ({ book, viewMode = "grid" }) => {
-    const formatPrice = (price) => {
-      const num = Number(price) || 0;
-      return new Intl.NumberFormat("bn-BD", {
-        style: "currency",
-        currency: "BDT",
-        minimumFractionDigits: 0,
-      })
-        .format(num)
-        .replace("BDT", "৳");
-    };
+  // Fetch books with filters
+  const { data: booksData, isLoading, isError, refetch } = useBooks({
+    page: filters.page,
+    limit: filters.limit,
+    search: filters.search || undefined,
+    category: filters.category.length > 0 ? filters.category : undefined,
+    minPrice: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
+    maxPrice: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
+    minRating: filters.minRating ? parseFloat(filters.minRating) : undefined,
+    sortBy: filters.sortBy,
+    order: filters.sortBy === "priceDesc" ? "desc" : 
+           filters.sortBy === "price" ? "asc" : 
+           filters.order,
+    featured: filters.featured || undefined,
+    bestseller: filters.bestseller || undefined,
+  });
 
+  const books = booksData?.data || [];
+  const pagination = booksData?.pagination || {};
+
+  // Format price function
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("bn-BD", {
+      style: "currency",
+      currency: "BDT",
+      minimumFractionDigits: 0,
+    })
+      .format(price || 0)
+      .replace("BDT", "৳");
+  };
+
+  // SMALLER BOOK CARD COMPONENT - Consistent Height
+  const BookCard = ({ book, viewMode = "grid" }) => {
     const originalPrice = Number(book.price) || 0;
     const discount = Number(book.discount) || 0;
-    const finalPrice =
-      discount > 0 ? originalPrice * (1 - discount / 100) : originalPrice;
+    const finalPrice = discount > 0 ? originalPrice * (1 - discount / 100) : originalPrice;
 
     if (viewMode === "list") {
       return (
-        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-6">
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Book Cover with Link */}
-            <Link href={`/books/${book._id}`} className="md:w-1/4">
-              <div className="relative aspect-3/4 rounded-lg overflow-hidden bg-linear-to-br from-blue-100 to-purple-100 cursor-pointer">
+        <div className="bg-white rounded-lg shadow hover:shadow-md transition-all h-full">
+          <div className="flex flex-col md:flex-row h-full">
+            {/* Book Cover - Smaller */}
+            <Link href={`/books/${book._id}`} className="md:w-1/5">
+              <div className="relative h-40 md:h-full bg-gradient-to-br from-gray-100 to-gray-200">
                 {book.images?.[0]?.url ? (
                   <img
                     src={book.images[0].url}
                     alt={book.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain p-2"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <BookOpen className="w-12 h-12 text-gray-400" />
-                  </div>
-                )}
-                {discount > 0 && (
-                  <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-sm font-bold">
-                    -{discount}%
+                    <BookOpen className="w-10 h-10 text-gray-400" />
                   </div>
                 )}
               </div>
             </Link>
 
             {/* Book Details */}
-            <div className="md:w-3/4">
-              <div className="flex flex-col md:flex-row justify-between">
-                <div className="flex-1">
-                  {/* Book Title with Link */}
-                  <Link href={`/books/${book._id}`}>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-blue-600 cursor-pointer">
-                      {book.title}
-                    </h3>
-                  </Link>
-                  <p className="text-gray-600 mb-3">by {book.author}</p>
-
-                  <div className="flex items-center mb-4">
-                    <div className="flex text-yellow-400">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < Math.floor(book.rating || 0)
-                              ? "fill-current"
-                              : ""
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="ml-2 text-gray-600">
-                      ({book.rating || 0})
-                    </span>
-                    <span className="mx-3 text-gray-400">•</span>
-                    <span className="text-gray-600">{book.category}</span>
-                  </div>
-
-                  <p className="text-gray-700 mb-6 line-clamp-2">
-                    {book.description}
-                  </p>
-                </div>
-
-                <div className="md:text-right">
-                  <div className="mb-4">
-                    {discount > 0 && (
-                      <span className="text-lg text-gray-500 line-through mr-2">
-                        {formatPrice(originalPrice)}
-                      </span>
-                    )}
-                    <span className="text-2xl font-bold text-blue-600 block">
-                      {formatPrice(finalPrice)}
-                    </span>
-                    {discount > 0 && (
-                      <span className="inline-block mt-1 bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">
-                        {discount}% ছাড়
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between mt-4">
-                <div className="flex gap-3">
-                  <button className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100">
-                    <Flame className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100">
-                    <Award className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <Link
-                  href={`/books/${book._id}`}
-                  className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  <BookOpen className="w-5 h-5 mr-2" />
-                  বিস্তারিত দেখুন
+            <div className="flex-1 p-4">
+              <div className="h-full flex flex-col">
+                <Link href={`/books/${book._id}`}>
+                  <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 line-clamp-2 text-sm">
+                    {book.title}
+                  </h3>
                 </Link>
+                <p className="text-gray-600 text-xs mb-2 line-clamp-1">{book.author}</p>
+
+                <div className="flex items-center mb-3">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-3 h-3 ${i < Math.floor(book.rating || 0) ? "fill-current" : ""}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="ml-1 text-xs text-gray-600">({book.rating || 0})</span>
+                </div>
+
+                <div className="mt-auto">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      {discount > 0 && (
+                        <span className="text-xs text-gray-500 line-through block">
+                          {formatPrice(originalPrice)}
+                        </span>
+                      )}
+                      <span className="text-lg font-bold text-blue-600">
+                        {formatPrice(finalPrice)}
+                      </span>
+                    </div>
+                    <Link
+                      href={`/books/${book._id}`}
+                      className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                    >
+                      বিস্তারিত
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -332,101 +324,89 @@ export default function BooksPageContent() {
       );
     }
 
-    // Grid View
+    // GRID VIEW - Smaller and Consistent Height
     return (
-      <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all overflow-hidden group">
-        {/* Book Cover with Link */}
+      <div className="bg-white rounded-lg shadow hover:shadow-md transition-all h-full flex flex-col">
+        {/* Book Cover - Smaller */}
         <Link href={`/books/${book._id}`} className="block">
-          <div className="relative aspect-3/4 overflow-hidden cursor-pointer">
-            <div className="absolute inset-0 bg-linear-to-br from-blue-100 to-purple-100">
-              {book.images?.[0]?.url ? (
-                <img
-                  src={book.images[0].url}
-                  alt={book.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <BookOpen className="w-16 h-16 text-gray-400" />
-                </div>
-              )}
-            </div>
+          <div className="relative h-48 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+            {book.images?.[0]?.url ? (
+              <img
+                src={book.images[0].url}
+                alt={book.title}
+                className="w-full h-full object-contain p-4 hover:scale-105 transition-transform duration-200"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <BookOpen className="w-12 h-12 text-gray-300" />
+              </div>
+            )}
 
-            {/* Badges */}
-            <div className="absolute top-3 left-3 flex flex-col gap-2">
+            {/* Badges - Smaller */}
+            <div className="absolute top-2 left-2 flex flex-col gap-1">
               {discount > 0 && (
-                <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                <span className="bg-red-500 text-white px-2 py-0.5 rounded text-xs font-bold">
                   -{discount}%
                 </span>
               )}
               {book.bestseller && (
-                <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                <span className="bg-yellow-500 text-white px-2 py-0.5 rounded text-xs font-bold">
                   বেস্টসেলার
-                </span>
-              )}
-              {book.featured && (
-                <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  ফিচার্ড
                 </span>
               )}
             </div>
           </div>
         </Link>
 
-        {/* Book Details */}
-        <div className="p-4">
-          {/* Book Title with Link */}
+        {/* Book Details - Fixed Height Container */}
+        <div className="p-3 flex flex-col flex-1">
           <Link href={`/books/${book._id}`}>
-            <h3 className="font-bold text-gray-900 mb-2 line-clamp-1 hover:text-blue-600 cursor-pointer">
+            <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 line-clamp-2 text-sm min-h-[2.5rem]">
               {book.title}
             </h3>
           </Link>
 
-          <p className="text-gray-600 text-sm mb-2 line-clamp-1">
-            by {book.author}
-          </p>
+          <p className="text-gray-600 text-xs mb-2 line-clamp-1">{book.author}</p>
 
           <div className="flex items-center mb-3">
             <div className="flex text-yellow-400">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-3 h-3 ${
-                    i < Math.floor(book.rating || 0) ? "fill-current" : ""
-                  }`}
+                  className={`w-3 h-3 ${i < Math.floor(book.rating || 0) ? "fill-current" : ""}`}
                 />
               ))}
             </div>
-            <span className="ml-1 text-sm text-gray-600">
-              ({book.rating || 0})
-            </span>
+            <span className="ml-1 text-xs text-gray-600">({book.rating || 0})</span>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              {discount > 0 && (
-                <span className="text-sm text-gray-500 line-through block">
-                  {formatPrice(originalPrice)}
+          {/* Price and Button - Fixed at bottom */}
+          <div className="mt-auto pt-2 border-t border-gray-100">
+            <div className="flex items-center justify-between">
+              <div>
+                {discount > 0 && (
+                  <span className="text-xs text-gray-500 line-through block">
+                    {formatPrice(originalPrice)}
+                  </span>
+                )}
+                <span className="text-base font-bold text-blue-600">
+                  {formatPrice(finalPrice)}
                 </span>
-              )}
-              <span className="text-lg font-bold text-blue-600">
-                {formatPrice(finalPrice)}
+              </div>
+
+              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                {book.category}
               </span>
             </div>
 
-            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-              {book.category}
-            </span>
+            {/* View Details Button - Always visible, smaller */}
+            <Link
+              href={`/books/${book._id}`}
+              className="block w-full mt-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 text-center"
+            >
+              বিস্তারিত দেখুন
+            </Link>
           </div>
-
-          {/* View Details Button */}
-          <Link
-            href={`/books/${book._id}`}
-            className="block w-full mt-4 py-2 bg-blue-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-blue-700"
-          >
-            <BookOpen className="w-4 h-4 mr-2" />
-            বিস্তারিত দেখুন
-          </Link>
         </div>
       </div>
     );
@@ -435,26 +415,23 @@ export default function BooksPageContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-linear-to-r from-blue-600 to-purple-600 text-white py-12">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">সমস্ত বই</h1>
             <p className="text-lg mb-8">
               {pagination.totalItems
-                ? `${pagination.totalItems}+ বই পাওয়া গেছে`
+                ? `${pagination.totalItems} বই পাওয়া গেছে`
                 : "আপনার পছন্দের বই খুঁজুন"}
             </p>
 
             {/* Search Bar */}
-            <form
-              onSubmit={handleSearch}
-              className="relative max-w-2xl mx-auto"
-            >
+            <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto">
               <input
                 type="text"
                 value={filters.search}
                 onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, search: e.target.value }))
+                  setFilters(prev => ({ ...prev, search: e.target.value }))
                 }
                 placeholder="বই, লেখক বা ক্যাটাগরি খুঁজুন..."
                 className="w-full px-6 py-4 pr-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-yellow-400"
@@ -490,28 +467,20 @@ export default function BooksPageContent() {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded ${
-                  viewMode === "grid"
-                    ? "bg-blue-100 text-blue-600"
-                    : "bg-gray-100"
-                }`}
+                className={`p-2 rounded ${viewMode === "grid" ? "bg-blue-100 text-blue-600" : "bg-gray-100"}`}
               >
                 <Grid className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded ${
-                  viewMode === "list"
-                    ? "bg-blue-100 text-blue-600"
-                    : "bg-gray-100"
-                }`}
+                className={`p-2 rounded ${viewMode === "list" ? "bg-blue-100 text-blue-600" : "bg-gray-100"}`}
               >
                 <List className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {/* Filters Sidebar - LEFT SIDE */}
+          {/* Filters Sidebar */}
           <AnimatePresence>
             {(showFilters || window.innerWidth >= 1024) && (
               <motion.aside
@@ -537,9 +506,7 @@ export default function BooksPageContent() {
                     <h3 className="font-bold mb-3">সর্ট করুন</h3>
                     <select
                       value={filters.sortBy}
-                      onChange={(e) =>
-                        handleFilterChange("sortBy", e.target.value)
-                      }
+                      onChange={(e) => handleFilterChange("sortBy", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
                       {SORT_OPTIONS.map((option) => (
@@ -584,9 +551,7 @@ export default function BooksPageContent() {
                               >
                                 <input
                                   type="checkbox"
-                                  checked={filters.category.includes(
-                                    category.name
-                                  )}
+                                  checked={filters.category.includes(category.name)}
                                   onChange={() => toggleCategory(category.name)}
                                   className="w-4 h-4 text-blue-600 rounded"
                                 />
@@ -626,7 +591,6 @@ export default function BooksPageContent() {
                           exit={{ height: 0, opacity: 0 }}
                           className="space-y-3 overflow-hidden"
                         >
-                          {/* Price Inputs */}
                           <div className="grid grid-cols-2 gap-2">
                             <div>
                               <label className="text-sm text-gray-600 mb-1 block">
@@ -635,9 +599,7 @@ export default function BooksPageContent() {
                               <input
                                 type="number"
                                 value={filters.minPrice}
-                                onChange={(e) =>
-                                  handleFilterChange("minPrice", e.target.value)
-                                }
+                                onChange={(e) => handleFilterChange("minPrice", e.target.value)}
                                 placeholder="0"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                               />
@@ -649,26 +611,21 @@ export default function BooksPageContent() {
                               <input
                                 type="number"
                                 value={filters.maxPrice}
-                                onChange={(e) =>
-                                  handleFilterChange("maxPrice", e.target.value)
-                                }
+                                onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
                                 placeholder="10000"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                               />
                             </div>
                           </div>
 
-                          {/* Quick Price Ranges */}
                           <div className="space-y-1">
                             {PRICE_RANGES.map((range) => (
                               <button
                                 key={`${range.min}-${range.max}`}
-                                onClick={() =>
-                                  handlePriceRange(range.min, range.max)
-                                }
+                                onClick={() => handlePriceRange(range.min, range.max)}
                                 className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
-                                  filters.minPrice == range.min &&
-                                  filters.maxPrice == range.max
+                                  filters.minPrice === range.min.toString() &&
+                                  filters.maxPrice === range.max.toString()
                                     ? "bg-blue-50 text-blue-600 border border-blue-200"
                                     : "hover:bg-gray-50"
                                 }`}
@@ -689,7 +646,6 @@ export default function BooksPageContent() {
                       onClick={() => toggleSection("rating")}
                     >
                       <h3 className="font-bold">রেটিং</h3>
-
                       {expandedSections.rating ? (
                         <ChevronUp className="w-4 h-4" />
                       ) : (
@@ -714,13 +670,13 @@ export default function BooksPageContent() {
                                 onClick={() =>
                                   handleFilterChange(
                                     "minRating",
-                                    filters.minRating === option.value
+                                    filters.minRating === option.value.toString()
                                       ? ""
-                                      : option.value
+                                      : option.value.toString()
                                   )
                                 }
                                 className={`w-full text-left px-3 py-2 rounded-lg flex items-center justify-between transition ${
-                                  filters.minRating === option.value
+                                  filters.minRating === option.value.toString()
                                     ? "bg-yellow-50 text-yellow-600 border border-yellow-200"
                                     : "hover:bg-gray-50"
                                 }`}
@@ -728,8 +684,7 @@ export default function BooksPageContent() {
                                 <span className="flex items-center">
                                   {option.label}
                                 </span>
-
-                                {filters.minRating === option.value && (
+                                {filters.minRating === option.value.toString() && (
                                   <Check className="w-4 h-4" />
                                 )}
                               </button>
@@ -782,10 +737,7 @@ export default function BooksPageContent() {
                               type="checkbox"
                               checked={filters.bestseller}
                               onChange={(e) =>
-                                handleFilterChange(
-                                  "bestseller",
-                                  e.target.checked
-                                )
+                                handleFilterChange("bestseller", e.target.checked)
                               }
                               className="w-4 h-4 text-blue-600 rounded"
                             />
@@ -803,17 +755,16 @@ export default function BooksPageContent() {
             )}
           </AnimatePresence>
 
-          {/* Main Content - RIGHT SIDE */}
+          {/* Main Content */}
           <div className="lg:w-3/4">
             {/* Active Filters Display */}
-            {Object.keys(filters).some(
-              (key) =>
-                (Array.isArray(filters[key]) && filters[key].length > 0) ||
-                (typeof filters[key] === "string" &&
-                  filters[key] &&
-                  !["sortBy", "order", "page", "limit"].includes(key)) ||
-                (typeof filters[key] === "boolean" && filters[key])
-            ) && (
+            {(filters.search || 
+              filters.category.length > 0 || 
+              filters.minRating || 
+              filters.minPrice || 
+              filters.maxPrice || 
+              filters.featured || 
+              filters.bestseller) && (
               <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-medium">সক্রিয় ফিল্টার:</h3>
@@ -935,21 +886,13 @@ export default function BooksPageContent() {
                 <span className="text-gray-600">ভিউ:</span>
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-lg ${
-                    viewMode === "grid"
-                      ? "bg-blue-100 text-blue-600"
-                      : "bg-gray-100"
-                  }`}
+                  className={`p-2 rounded-lg ${viewMode === "grid" ? "bg-blue-100 text-blue-600" : "bg-gray-100"}`}
                 >
                   <Grid className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-lg ${
-                    viewMode === "list"
-                      ? "bg-blue-100 text-blue-600"
-                      : "bg-gray-100"
-                  }`}
+                  className={`p-2 rounded-lg ${viewMode === "list" ? "bg-blue-100 text-blue-600" : "bg-gray-100"}`}
                 >
                   <List className="w-5 h-5" />
                 </button>
@@ -1001,11 +944,12 @@ export default function BooksPageContent() {
                   </div>
                 ) : (
                   <>
+                    {/* Grid Layout - More columns for smaller cards */}
                     <div
                       className={
                         viewMode === "grid"
-                          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                          : "space-y-6"
+                          ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+                          : "space-y-4"
                       }
                     >
                       {books.map((book, index) => (
@@ -1014,6 +958,7 @@ export default function BooksPageContent() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
+                          className="h-full"
                         >
                           <BookCard book={book} viewMode={viewMode} />
                         </motion.div>
@@ -1025,9 +970,7 @@ export default function BooksPageContent() {
                       <div className="mt-12 flex justify-center">
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() =>
-                              handleFilterChange("page", filters.page - 1)
-                            }
+                            onClick={() => handleFilterChange("page", filters.page - 1)}
                             disabled={filters.page === 1}
                             className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50"
                           >
@@ -1053,9 +996,7 @@ export default function BooksPageContent() {
                               return (
                                 <button
                                   key={pageNum}
-                                  onClick={() =>
-                                    handleFilterChange("page", pageNum)
-                                  }
+                                  onClick={() => handleFilterChange("page", pageNum)}
                                   className={`px-4 py-2 rounded-lg ${
                                     filters.page === pageNum
                                       ? "bg-blue-600 text-white"
@@ -1069,9 +1010,7 @@ export default function BooksPageContent() {
                           )}
 
                           <button
-                            onClick={() =>
-                              handleFilterChange("page", filters.page + 1)
-                            }
+                            onClick={() => handleFilterChange("page", filters.page + 1)}
                             disabled={filters.page >= pagination.totalPages}
                             className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50"
                           >

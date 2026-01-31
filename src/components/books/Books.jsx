@@ -1,241 +1,279 @@
 // app/page.js - Home Page with Category-wise Books
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import Image from 'next/image';
-import { 
-  Star, BookOpen, ArrowRight, ChevronRight, 
-  TrendingUp, Award, Clock, ShoppingBag,
-  Heart, Eye, Tag, Users, Sparkles, Bookmark
-} from 'lucide-react';
-import { useCategories } from '@/hooks/api/categories';
-import { useBooks, useAllBooks } from '@/hooks/useBooks';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
+import { ThreeDCard } from "@/components/ui/3d-card";
+import {
+  Star,
+  BookOpen,
+  ArrowRight,
+  TrendingUp,
+  Award,
+  Clock,
+  ShoppingBag,
+  Heart,
+  Eye,
+  Tag,
+  Users,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { useCategories } from "@/hooks/api/categories";
+import { useBooks, useAllBooks } from "@/hooks/useBooks";
 
 export default function HomePage() {
-  const [activeCategory, setActiveCategory] = useState('all');
-  
-  // Fetch all categories
-  const { data: categories = [], isLoading: categoriesLoading } = useCategories({
-    lang: 'bn',
-    isActive: true,
-    sort: 'bookCount',
-    limit: 8
-  });
-  
-  // Fetch books for each category
-  const [categoryBooks, setCategoryBooks] = useState({});
-  
-  useEffect(() => {
-    if (categories.length > 0) {
-      // Initialize with first category
-      setActiveCategory(categories[0].name);
-    }
-  }, [categories]);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [categoryOffset, setCategoryOffset] = useState(0);
+  const CATEGORIES_PER_VIEW = 6;
 
-  // Hero Books (Featured/Bestsellers)
+  // Fetch all categories
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories(
+    {
+      lang: "bn",
+      isActive: true,
+      sort: "bookCount",
+      limit: 20,
+    }
+  );
+
+  // Fetch hero books
   const { data: heroBooksData } = useBooks({
     featured: true,
     limit: 4,
-    sortBy: 'rating',
-    order: 'desc'
+    sortBy: "rating",
+    order: "desc",
   });
   const { data: allBooksData } = useAllBooks();
 
   const heroBooks = heroBooksData?.data || [];
 
+  // Reset offset when active category changes
+  useEffect(() => {
+    setCategoryOffset(0);
+  }, [activeCategory]);
+
   // Format price
   const formatPrice = (price) => {
     const num = Number(price) || 0;
-    return new Intl.NumberFormat('bn-BD', {
-      style: 'currency',
-      currency: 'BDT',
-      minimumFractionDigits: 0
-    }).format(num).replace('BDT', '৳');
+    return new Intl.NumberFormat("bn-BD", {
+      style: "currency",
+      currency: "BDT",
+      minimumFractionDigits: 0,
+    })
+      .format(num)
+      .replace("BDT", "৳");
+  };
+
+  // Calculate visible categories
+  const visibleCategories = categories.slice(
+    categoryOffset,
+    categoryOffset + CATEGORIES_PER_VIEW
+  );
+  const canScrollLeft = categoryOffset > 0;
+  const canScrollRight = categoryOffset + CATEGORIES_PER_VIEW < categories.length;
+
+  // Navigation for category buttons
+  const handleNextCategories = () => {
+    if (canScrollRight) {
+      setCategoryOffset(prev => prev + 1);
+    }
+  };
+
+  const handlePrevCategories = () => {
+    if (canScrollLeft) {
+      setCategoryOffset(prev => prev - 1);
+    }
   };
 
   // Book Card Component
   const BookCard = ({ book }) => {
-    if (!book) return null;
+  if (!book) return null;
 
-    const originalPrice = Number(book.price) || 0;
-    const discount = Number(book.discount) || 0;
-    const finalPrice = discount > 0 
-      ? originalPrice * (1 - discount / 100)
-      : originalPrice;
+  const originalPrice = Number(book.price) || 0;
+  const discount = Number(book.discount) || 0;
+  const finalPrice = discount > 0 ? originalPrice * (1 - discount / 100) : originalPrice;
 
-    return (
-      <motion.div
-        whileHover={{ y: -10, scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-      >
-        {/* Book Cover */}
-        <Link href={`/books/${book._id}`} className="block">
-          <div className="relative aspect-3/4 overflow-hidden">
-            <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-purple-50">
-              {book.images?.[0]?.url ? (
-                <Image
-                  src={book.images[0].url}
-                  alt={book.title}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <BookOpen className="w-16 h-16 text-gray-400" />
-                </div>
-              )}
-            </div>
-            
-            {/* Badges */}
-            <div className="absolute top-3 left-3 flex flex-col gap-2">
-              {discount > 0 && (
-                <span className="bg-linear-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                  -{discount}%
-                </span>
-              )}
-              {book.bestseller && (
-                <span className="bg-linear-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                  <TrendingUp className="w-3 h-3 inline mr-1" />
-                  বেস্টসেলার
-                </span>
-              )}
-            </div>
-
-            {/* Quick Actions */}
-            <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="flex flex-col gap-2">
-                <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white shadow-lg">
-                  <Heart className="w-4 h-4 text-gray-700" />
-                </button>
-                <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white shadow-lg">
-                  <Eye className="w-4 h-4 text-gray-700" />
-                </button>
+  return (
+    <ThreeDCard
+      rotateDelta={10}
+      translateZ={25}  // slightly less pop for compact feel
+      containerClassName="h-full shadow-lg hover:shadow-2xl transition-shadow"
+    >
+      <div className="group relative bg-white rounded-2xl overflow-hidden h-full flex flex-col">
+        {/* Shorter Cover */}
+        <Link href={`/books/${book._id}`} className="block relative aspect-[4/5] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50">
+            {book.images?.[0]?.url ? (
+              <Image
+                src={book.images[0].url}
+                alt={book.title}
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-700"
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <BookOpen className="w-12 h-12 text-gray-400" />
               </div>
+            )}
+          </div>
+
+          {/* Badges - smaller */}
+          <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10">
+            {discount > 0 && (
+              <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-md">
+                -{discount}%
+              </span>
+            )}
+            {book.bestseller && (
+              <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-md flex items-center">
+                <TrendingUp className="w-3 h-3 mr-1" /> বেস্টসেলার
+              </span>
+            )}
+          </div>
+
+          {/* Quick Actions - smaller */}
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+            <div className="flex flex-col gap-1.5">
+              <button className="p-1.5 bg-white/90 backdrop-blur rounded-full hover:bg-white shadow">
+                <Heart className="w-4 h-4 text-gray-700" />
+              </button>
+              <button className="p-1.5 bg-white/90 backdrop-blur rounded-full hover:bg-white shadow">
+                <Eye className="w-4 h-4 text-gray-700" />
+              </button>
             </div>
           </div>
         </Link>
 
-        {/* Book Details */}
-        <div className="p-5">
+        {/* Details - more compact */}
+        <div className="p-4 flex flex-col flex-grow">
           <Link href={`/books/${book._id}`}>
-            <h3 className="font-bold text-gray-900 mb-2 line-clamp-1 hover:text-blue-600 transition-colors">
+            <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1.5 line-clamp-2 hover:text-blue-600 transition-colors">
               {book.title}
             </h3>
           </Link>
-          
-          <p className="text-gray-600 text-sm mb-3 line-clamp-1">
+          <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-1">
             by {book.author}
           </p>
 
-          {/* Rating */}
-          <div className="flex items-center mb-4">
+          <div className="flex items-center mb-3">
             <div className="flex text-yellow-400">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-4 h-4 ${i < Math.floor(book.rating || 0) ? 'fill-current' : ''}`}
+                  className={`w-3.5 h-3.5 ${i < Math.floor(book.rating || 0) ? 'fill-current' : ''}`}
                 />
               ))}
             </div>
-            <span className="ml-2 text-sm text-gray-600">({book.rating || 0})</span>
+            <span className="ml-1.5 text-xs text-gray-600">({book.rating?.toFixed(1) || 0})</span>
           </div>
 
-          {/* Price */}
-          <div className="flex items-center justify-between">
+          <div className="mt-auto flex items-center justify-between">
             <div>
               {discount > 0 && (
-                <span className="text-sm text-gray-500 line-through block">
+                <span className="text-xs text-gray-500 line-through block">
                   {formatPrice(originalPrice)}
                 </span>
               )}
-              <span className="text-xl font-bold text-blue-600">
+              <span className="text-xl sm:text-2xl font-bold text-blue-600">
                 {formatPrice(finalPrice)}
               </span>
             </div>
-            
-            <Link 
+            <Link
               href={`/books/${book._id}`}
-              className="px-4 py-2 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+              className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-xs sm:text-sm font-medium hover:opacity-90 transition"
             >
               বিস্তারিত
             </Link>
           </div>
         </div>
-
-        {/* Hover Effect Border */}
-        <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-400 rounded-2xl transition-colors duration-300 pointer-events-none" />
-      </motion.div>
-    );
-  };
-
-  // Category Section
+      </div>
+    </ThreeDCard>
+  );
+};
+  // Category Section - Fixed to show 4 books per row
   const CategorySection = ({ category }) => {
     const { data: categoryBooksData, isLoading } = useBooks({
       category: category.name,
-      limit: 6,
-      sortBy: 'rating',
-      order: 'desc'
+      limit: 8, // Get 8 books but show 4 per row
+      sortBy: "rating",
+      order: "desc",
     });
 
     const books = categoryBooksData?.data || [];
+    const booksFirstRow = books.slice(0, 4);
+    const booksSecondRow = books.slice(4, 8);
 
     if (books.length === 0) return null;
 
     return (
-      <section className="mb-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <div className="flex items-center mb-2">
-              <div className="w-8 h-8 rounded-lg bg-linear-to-r from-blue-500 to-purple-500 flex items-center justify-center mr-3">
-                <BookOpen className="w-4 h-4 text-white" />
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        className="mb-20"
+      >
+        {/* Category Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-10">
+          <div className="mb-4 md:mb-0">
+            <div className="flex items-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mr-3 shadow-lg">
+                <BookOpen className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                {category.displayName || category.name}
-              </h2>
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  {category.displayName || category.name}
+                </h2>
+                <p className="text-gray-600 mt-1">
+                  {category.bookCount || books.length}+ বই এই ক্যাটাগরিতে
+                </p>
+              </div>
             </div>
-            <p className="text-gray-600">
-              {category.bookCount || 0}+ বই এই ক্যাটাগরিতে
-            </p>
           </div>
-          
+
           <Link
             href={`/books?category=${category.name}`}
-            className="flex items-center text-blue-600 hover:text-blue-700 font-medium"
+            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium hover:opacity-90 transition group"
           >
-            সব দেখুন
-            <ArrowRight className="w-4 h-4 ml-2" />
+            সব বই দেখুন
+            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
+        {/* Books Grid - First Row (4 books) */}
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="aspect-3/4 bg-gray-200 rounded-2xl mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                <div className="aspect-[3/4] bg-gray-200 rounded-2xl mb-4"></div>
+                <div className="h-5 bg-gray-200 rounded mb-3"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {books.map((book) => (
-              <BookCard key={book._id} book={book} />
-            ))}
-          </div>
+          <>
+            {/* First Row - 4 books */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+              {booksFirstRow.map((book) => (
+                <BookCard key={book._id} book={book} className="w-full" />
+              ))}
+            </div>
+          </>
         )}
-      </section>
+      </motion.section>
     );
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-linear-to-r from-blue-900 via-purple-900 to-indigo-900 text-white">
+      <div className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-purple-900 to-indigo-900 text-white">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
@@ -250,7 +288,9 @@ export default function HomePage() {
               className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6"
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              <span className="font-medium">বাংলাদেশের বৃহত্তম অনলাইন বইয়ের দোকান</span>
+              <span className="font-medium">
+                বাংলাদেশের বৃহত্তম অনলাইন বইয়ের দোকান
+              </span>
             </motion.div>
 
             <motion.h1
@@ -269,8 +309,8 @@ export default function HomePage() {
               transition={{ delay: 0.2 }}
               className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto"
             >
-              ১০,০০০+ বইয়ের বিশাল সংগ্রহ থেকে আপনার পছন্দের বই খুঁজে নিন।
-              হোম ডেলিভারি সহ দেশব্যাপী সেবা।
+              ১০,০০০+ বইয়ের বিশাল সংগ্রহ থেকে আপনার পছন্দের বই খুঁজে নিন। হোম
+              ডেলিভারি সহ দেশব্যাপী সেবা।
             </motion.p>
 
             <motion.div
@@ -281,7 +321,7 @@ export default function HomePage() {
             >
               <Link
                 href="/books"
-                className="px-8 py-4 bg-linear-to-r from-yellow-400 to-yellow-500 text-gray-900 font-bold rounded-xl hover:shadow-2xl transition-shadow flex items-center justify-center"
+                className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 font-bold rounded-xl hover:shadow-2xl transition-shadow flex items-center justify-center"
               >
                 <BookOpen className="w-5 h-5 mr-2" />
                 সব বই দেখুন
@@ -300,23 +340,24 @@ export default function HomePage() {
       {/* Featured Books Section */}
       {heroBooks.length > 0 && (
         <div className="container mx-auto px-4 py-16">
-          <div className="flex items-center justify-between mb-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-10">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                <Award className="w-8 h-8 text-yellow-500 inline mr-3" />
+              <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
+                <Award className="w-8 h-8 text-yellow-500 mr-3" />
                 ফিচার্ড বইসমূহ
               </h2>
               <p className="text-gray-600">এই সপ্তাহের সবচেয়ে জনপ্রিয় বইগুলো</p>
             </div>
             <Link
               href="/books?featured=true"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="mt-4 md:mt-0 text-blue-600 hover:text-blue-700 font-medium flex items-center"
             >
-              আরও দেখুন →
+              আরও দেখুন
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {heroBooks.map((book, index) => (
               <motion.div
                 key={book._id}
@@ -332,14 +373,14 @@ export default function HomePage() {
       )}
 
       {/* Stats Section */}
-      <div className="bg-linear-to-r from-blue-50 to-purple-50 py-12">
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { icon: BookOpen, value: allBooksData?.length || 0, label: 'বই' },
-              { icon: Users, value: '৫,০০০+', label: 'পাঠক' },
-              { icon: Tag, value: categories?.length || 0, label: 'ক্যাটাগরি' },
-              { icon: Clock, value: '২৪/৭', label: 'সাপোর্ট' },
+              { icon: BookOpen, value: allBooksData?.length || 0, label: "বই" },
+              { icon: Users, value: "৫,০০০+", label: "পাঠক" },
+              { icon: Tag, value: categories?.length || 0, label: "ক্যাটাগরি" },
+              { icon: Clock, value: "২৪/৭", label: "সাপোর্ট" },
             ].map((stat, index) => (
               <motion.div
                 key={index}
@@ -352,7 +393,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <stat.icon className="w-8 h-8 text-blue-600" />
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
+                <div className="text-3xl font-bold text-gray-900 mb-2">
+                  {stat.value}
+                </div>
                 <div className="text-gray-600">{stat.label}</div>
               </motion.div>
             ))}
@@ -364,39 +407,75 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-16">
         {/* Categories Navigation */}
         {categories.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">
               ক্যাটাগরি অনুযায়ী বই
             </h2>
-            
-            <div className="flex flex-wrap justify-center gap-3 mb-10">
-              <button
-                onClick={() => setActiveCategory('all')}
-                className={`px-6 py-3 rounded-full font-medium transition-all ${
-                  activeCategory === 'all'
-                    ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                সব ক্যাটাগরি
-              </button>
-              
-              {categories.map((category) => (
-                <button
-                  key={category._id}
-                  onClick={() => setActiveCategory(category.name)}
-                  className={`px-6 py-3 rounded-full font-medium transition-all ${
-                    activeCategory === category.name
-                      ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {category.displayName || category.name}
-                  <span className="ml-2 text-sm opacity-80">
-                    ({category.bookCount || 0})
-                  </span>
-                </button>
-              ))}
+
+            <div className="relative">
+              {/* Navigation Arrows */}
+              {categories.length > CATEGORIES_PER_VIEW && (
+                <>
+                  <button
+                    onClick={handlePrevCategories}
+                    disabled={!canScrollLeft}
+                    className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-opacity ${
+                      canScrollLeft
+                        ? "opacity-100 hover:shadow-xl"
+                        : "opacity-0 cursor-not-allowed"
+                    }`}
+                  >
+                    <ChevronLeft className="w-5 h-5 text-gray-700" />
+                  </button>
+                  <button
+                    onClick={handleNextCategories}
+                    disabled={!canScrollRight}
+                    className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-opacity ${
+                      canScrollRight
+                        ? "opacity-100 hover:shadow-xl"
+                        : "opacity-0 cursor-not-allowed"
+                    }`}
+                  >
+                    <ChevronRight className="w-5 h-5 text-gray-700" />
+                  </button>
+                </>
+              )}
+
+              {/* Category Buttons */}
+              <div className="flex overflow-x-auto scrollbar-hide pb-4">
+                <div className="flex gap-3 mx-auto">
+                  <button
+                    onClick={() => setActiveCategory("all")}
+                    className={`flex-shrink-0 px-6 py-3 rounded-full font-medium transition-all whitespace-nowrap ${
+                      activeCategory === "all"
+                        ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    সব ক্যাটাগরি
+                  </button>
+
+                  {visibleCategories.map((category) => (
+                    <button
+                      key={category._id}
+                      onClick={() => setActiveCategory(category.name)}
+                      className={`flex-shrink-0 px-6 py-3 rounded-full font-medium transition-all whitespace-nowrap ${
+                        activeCategory === category.name
+                          ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {category.displayName || category.name}
+                    </button>
+                  ))}
+
+                  {categories.length > CATEGORIES_PER_VIEW && (
+                    <div className="flex-shrink-0 px-4 py-3 text-gray-500 font-medium">
+                      {categoryOffset + CATEGORIES_PER_VIEW} / {categories.length}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -407,21 +486,27 @@ export default function HomePage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600">ক্যাটাগরি লোড হচ্ছে...</p>
           </div>
+        ) : activeCategory === "all" ? (
+          // Show all categories
+          categories.map((category, index) => (
+            <CategorySection key={category._id} category={category} />
+          ))
         ) : (
-          /* Show all categories or selected category */
-          activeCategory === 'all' 
-            ? categories.map((category) => (
-                <CategorySection key={category._id} category={category} />
-              ))
-            : categories
-                .filter(cat => cat.name === activeCategory)
-                .map((category) => (
-                  <CategorySection key={category._id} category={category} />
-                ))
+          // Show selected category
+          categories
+            .filter((cat) => cat.name === activeCategory)
+            .map((category) => (
+              <CategorySection key={category._id} category={category} />
+            ))
         )}
 
         {/* CTA Section */}
-        <div className="bg-linear-to-r from-blue-500 to-purple-500 rounded-3xl p-8 md:p-12 text-white text-center mt-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl p-8 md:p-12 text-white text-center mt-20 shadow-2xl"
+        >
           <h3 className="text-3xl font-bold mb-4">
             আপনার পছন্দের বই এখনই সংগ্রহ করুন
           </h3>
@@ -431,7 +516,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/books"
-              className="px-8 py-4 bg-white text-blue-600 font-bold rounded-xl hover:bg-gray-100 transition-colors"
+              className="px-8 py-4 bg-white text-blue-600 font-bold rounded-xl hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl"
             >
               সব বই ব্রাউজ করুন
             </Link>
@@ -442,7 +527,7 @@ export default function HomePage() {
               বেস্টসেলার দেখুন
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Footer Banner */}
@@ -451,19 +536,36 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div>
               <h4 className="text-xl font-bold mb-4">দ্রুত ডেলিভারি</h4>
-              <p className="text-gray-400">ঢাকা শহরে ২৪ ঘন্টায়, অন্যান্য বিভাগে ২-৩ কর্মদিবসে</p>
+              <p className="text-gray-400">
+                ঢাকা শহরে ২৪ ঘন্টায়, অন্যান্য বিভাগে ২-৩ কর্মদিবসে
+              </p>
             </div>
             <div>
               <h4 className="text-xl font-bold mb-4">সুরক্ষিত পেমেন্ট</h4>
-              <p className="text-gray-400">SSL সিকিউরড পেমেন্ট গেটওয়ে দিয়ে নিরাপদ লেনদেন</p>
+              <p className="text-gray-400">
+                SSL সিকিউরড পেমেন্ট গেটওয়ে দিয়ে নিরাপদ লেনদেন
+              </p>
             </div>
             <div>
               <h4 className="text-xl font-bold mb-4">২৪/৭ সাপোর্ট</h4>
-              <p className="text-gray-400">যেকোনো সমস্যায় কল করুন: ০১৬XX-XXXXXX</p>
+              <p className="text-gray-400">
+                যেকোনো সমস্যায় কল করুন: ০১৬XX-XXXXXX
+              </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Add custom scrollbar hide */}
+      <style jsx global>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }

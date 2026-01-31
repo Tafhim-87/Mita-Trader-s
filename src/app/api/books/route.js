@@ -37,6 +37,7 @@ export async function GET(request) {
     const minRating = parseFloat(searchParams.get("minRating"));
     const featured = searchParams.get("featured") === "true";
     const bestseller = searchParams.get("bestseller") === "true";
+    const bestOfMonth = searchParams.get("bestOfMonth") === "true";
 
     // Build MongoDB query
     const query = {
@@ -51,6 +52,9 @@ export async function GET(request) {
         { description: { $regex: search, $options: "i" } },
       ];
     }
+
+    // Best of month
+    if (bestOfMonth) query.bestOfMonth = true;
 
     // Category (support comma-separated or single value)
     if (category) {
@@ -192,11 +196,18 @@ export async function POST(request) {
 
     // If bestOfMonth is true, reset previous best book
     if (bestOfMonth) {
-      await Book.updateMany(
-        { bestOfMonth: true },
-        { $set: { bestOfMonth: false } }
-      );
-    }
+  const count = await Book.countDocuments({ bestOfMonth: true });
+
+  if (count >= 5) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Only 5 Best Of Month books allowed",
+      },
+      { status: 400 }
+    );
+  }
+}
 
     // Then create the book
     const book = await Book.create({
@@ -237,9 +248,4 @@ export async function POST(request) {
   }
 }
 
-// export const runtime = 'nodejs'; // VERY IMPORTANT
 
-// import { NextResponse } from 'next/server';
-// import connectDB from '@/lib/db';
-// import Book from '@/models/Book';
-// import cloudinary from '@/lib/cloudinary';

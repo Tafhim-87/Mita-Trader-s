@@ -88,7 +88,7 @@ export const useCreateBook = () => {
 };
 
 /* ===============================
-   UPDATE BOOK
+   UPDATE BOOK (Full Replace)
    PUT /api/books/:id
 ================================ */
 export const useUpdateBook = () => {
@@ -105,6 +105,7 @@ export const useUpdateBook = () => {
     },
   });
 };
+
 
 /* ===============================
    DELETE BOOK
@@ -148,6 +149,26 @@ export const useRelatedBooks = (bookId, category, limit = 4) => {
     queryFn: async () => {
       const { data } = await api.get(`/api/books?category=${category}&limit=${limit}&exclude=${bookId}`);
       return data.data;
+    },
+  });
+};
+
+/* ===============================
+   PATCH BOOK (Partial Update)
+   PATCH /api/books/:id
+================================ */
+export const usePatchBook = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, payload }) => {
+      const { data } = await api.patch(`/api/books/${id}`, payload);
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      // Refresh list + single book
+      queryClient.invalidateQueries({ queryKey: BOOKS_KEY });
+      queryClient.invalidateQueries({ queryKey: [...BOOKS_KEY, variables.id] });
     },
   });
 };

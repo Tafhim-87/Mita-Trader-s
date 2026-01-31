@@ -234,7 +234,7 @@ export default function BooksPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-14 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                      <div className="w-10 h-14 bg-gray-200 rounded overflow-hidden shrink-0">
                         {book.images?.[0]?.url ? (
                           <img
                             src={book.images[0].url}
