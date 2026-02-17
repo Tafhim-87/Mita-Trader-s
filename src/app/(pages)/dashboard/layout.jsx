@@ -22,9 +22,6 @@ export default function DashboardLayout({ children }) {
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Books', href: '/dashboard/books', icon: BookOpen },
     { name: 'Categories', href: '/dashboard/categories', icon: Tag },
-    { name: 'Orders', href: '/dashboard/orders', icon: ShoppingCart },
-    { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
   return (

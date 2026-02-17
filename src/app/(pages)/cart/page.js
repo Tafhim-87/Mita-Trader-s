@@ -31,7 +31,7 @@ const CartPage = () => {
   const [errors, setErrors] = useState({});
   
   // Your WhatsApp number
-  const whatsappNumber = "8801906884840";
+  const whatsappNumber = "8801779527744";
 
   // ✅ MOVE FORMAT PRICE FUNCTION TO TOP
   const formatPrice = (price) => {

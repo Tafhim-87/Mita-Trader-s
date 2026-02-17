@@ -8,6 +8,8 @@ import { FaSearch, FaShoppingCart, FaBars, FaTimes, FaHome, FaBook, FaInfoCircle
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
+import mitaLogo from '../../../public/mitalogo.png';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -76,14 +78,14 @@ const Navbar = () => {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm">
-                <span className="text-2xl font-extrabold text-indigo-600">B</span>
+                <span className="text-2xl font-extrabold text-indigo-600"><Image src={mitaLogo} alt="Mita Logo" width={32} height={32} /></span>
               </div>
               <span
-                className={`text-xl font-bold tracking-tight ${
+                className={`text-xl font-bold tracking-tight logoFont ${
                   scrolled ? 'text-gray-900' : 'text-white'
                 } hidden sm:block`}
               >
-                BookStore
+                MitaStore
               </span>
             </Link>
 

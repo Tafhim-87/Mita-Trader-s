@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+
 @import "tailwindcss";
 
 @import 'swiper/css';
@@ -23,6 +25,10 @@
     black 85%,
     transparent 100%
   );
+}
+
+.logoFont{
+  font-family: 'MedievalSharp', cursive;
 }
 
 @theme inline {
