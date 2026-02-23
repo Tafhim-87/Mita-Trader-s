@@ -220,35 +220,35 @@ const CartPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b p-6 rounded-t-2xl">
+            <div className="sticky top-0 bg-white border-b p-4 sm:p-6 rounded-t-2xl">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-green-100 rounded-lg">
-                    <FaWhatsapp className="w-6 h-6 text-green-600" />
+                    <FaWhatsapp className="w-[clamp(1.25rem,4vw,1.5rem)] h-[clamp(1.25rem,4vw,1.5rem)] text-green-600" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-800">Complete Your Order</h2>
-                    <p className="text-gray-600">Fill in your details to proceed to WhatsApp</p>
+                    <h2 className="text-[clamp(1.25rem,5vw,1.5rem)] font-bold text-gray-800">Complete Your Order</h2>
+                    <p className="text-[clamp(0.75rem,2vw,0.875rem)] text-gray-600">Fill in your details to proceed to WhatsApp</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowCustomerForm(false)}
                   className="p-2 hover:bg-gray-100 rounded-full"
                 >
-                  <FaTimes className="w-5 h-5 text-gray-500" />
+                  <FaTimes className="w-[clamp(1rem,3vw,1.25rem)] h-[clamp(1rem,3vw,1.25rem)] text-gray-500" />
                 </button>
               </div>
               
               {/* Order Summary Preview */}
               <div className="bg-blue-50 p-4 rounded-lg">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                   <div>
-                    <p className="font-medium text-gray-800">Order Summary</p>
-                    <p className="text-sm text-gray-600">{totalItems} items • ৳{formatPrice(totalPrice)}</p>
+                    <p className="font-medium text-gray-800 text-[clamp(0.875rem,2.5vw,1rem)]">Order Summary</p>
+                    <p className="text-[clamp(0.75rem,2vw,0.875rem)] text-gray-600">{totalItems} items • ৳{formatPrice(totalPrice)}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-gray-600">Shipping: {totalPrice >= 500 ? 'FREE' : '৳50'}</p>
-                    <p className="font-bold text-lg text-blue-600">
+                  <div className="text-left sm:text-right">
+                    <p className="text-[clamp(0.75rem,2vw,0.875rem)] text-gray-600">Shipping: {totalPrice >= 500 ? 'FREE' : '৳50'}</p>
+                    <p className="font-bold text-[clamp(1rem,3vw,1.25rem)] text-blue-600">
                       Total: ৳{formatPrice(totalPrice >= 500 ? totalPrice : totalPrice + 50)}
                     </p>
                   </div>
@@ -257,18 +257,18 @@ const CartPage = () => {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleFormSubmit} className="p-6">
+            <form onSubmit={handleFormSubmit} className="p-4 sm:p-6">
               <div className="space-y-6">
                 {/* Personal Information */}
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <h3 className="text-[clamp(1rem,3vw,1.125rem)] font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <FaUser className="w-5 h-5 text-blue-600" />
                     Personal Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Name */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-[clamp(0.75rem,2vw,0.875rem)] font-medium text-gray-700 mb-2">
                         Full Name *
                       </label>
                       <input
@@ -276,32 +276,32 @@ const CartPage = () => {
                         name="name"
                         value={customerDetails.name}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 rounded-lg border ${errors.name ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                        className={`w-full px-4 py-3 rounded-lg border ${errors.name ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[clamp(0.875rem,2.5vw,1rem)]`}
                         placeholder="Enter your full name"
                       />
                       {errors.name && (
-                        <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                        <p className="mt-1 text-[clamp(0.75rem,2vw,0.875rem)] text-red-600">{errors.name}</p>
                       )}
                     </div>
 
                     {/* Phone */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-[clamp(0.75rem,2vw,0.875rem)] font-medium text-gray-700 mb-2">
                         Phone Number *
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">+88</span>
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-[clamp(0.875rem,2.5vw,1rem)]">+88</span>
                         <input
                           type="tel"
                           name="phone"
                           value={customerDetails.phone}
                           onChange={handleInputChange}
-                          className={`w-full pl-12 pr-4 py-3 rounded-lg border ${errors.phone ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                          className={`w-full pl-12 pr-4 py-3 rounded-lg border ${errors.phone ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[clamp(0.875rem,2.5vw,1rem)]`}
                           placeholder="01XXXXXXXXX"
                         />
                       </div>
                       {errors.phone && (
-                        <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                        <p className="mt-1 text-[clamp(0.75rem,2vw,0.875rem)] text-red-600">{errors.phone}</p>
                       )}
                     </div>
                   </div>
@@ -309,21 +309,21 @@ const CartPage = () => {
 
                 {/* Address Information */}
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <h3 className="text-[clamp(1rem,3vw,1.125rem)] font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <FaMapMarkerAlt className="w-5 h-5 text-green-600" />
                     Delivery Address
                   </h3>
                   <div className="space-y-4">
                     {/* District */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-[clamp(0.75rem,2vw,0.875rem)] font-medium text-gray-700 mb-2">
                         District *
                       </label>
                       <select
                         name="district"
                         value={customerDetails.district}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 rounded-lg border ${errors.district ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                        className={`w-full px-4 py-3 rounded-lg border ${errors.district ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[clamp(0.875rem,2.5vw,1rem)]`}
                       >
                         <option value="">Select District</option>
                         {districts.map(district => (
@@ -333,13 +333,13 @@ const CartPage = () => {
                         ))}
                       </select>
                       {errors.district && (
-                        <p className="mt-1 text-sm text-red-600">{errors.district}</p>
+                        <p className="mt-1 text-[clamp(0.75rem,2vw,0.875rem)] text-red-600">{errors.district}</p>
                       )}
                     </div>
 
                     {/* Address Details */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-[clamp(0.75rem,2vw,0.875rem)] font-medium text-gray-700 mb-2">
                         Full Address *
                       </label>
                       <textarea
@@ -347,11 +347,11 @@ const CartPage = () => {
                         value={customerDetails.address}
                         onChange={handleInputChange}
                         rows="3"
-                        className={`w-full px-4 py-3 rounded-lg border ${errors.address ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                        className={`w-full px-4 py-3 rounded-lg border ${errors.address ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[clamp(0.875rem,2.5vw,1rem)]`}
                         placeholder="House/Road, Area, Thana"
                       />
                       {errors.address && (
-                        <p className="mt-1 text-sm text-red-600">{errors.address}</p>
+                        <p className="mt-1 text-[clamp(0.75rem,2vw,0.875rem)] text-red-600">{errors.address}</p>
                       )}
                     </div>
                   </div>
@@ -359,7 +359,7 @@ const CartPage = () => {
 
                 {/* Payment Method */}
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <h3 className="text-[clamp(1rem,3vw,1.125rem)] font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <FaCreditCard className="w-5 h-5 text-purple-600" />
                     Payment Method
                   </h3>
@@ -380,8 +380,8 @@ const CartPage = () => {
                           )}
                         </div>
                         <div>
-                          <p className="font-medium text-gray-800">Cash on Delivery</p>
-                          <p className="text-sm text-gray-600">Pay when you receive</p>
+                          <p className="font-medium text-gray-800 text-[clamp(0.875rem,2.5vw,1rem)]">Cash on Delivery</p>
+                          <p className="text-[clamp(0.75rem,2vw,0.875rem)] text-gray-600">Pay when you receive</p>
                         </div>
                       </div>
                     </label>
@@ -402,8 +402,8 @@ const CartPage = () => {
                           )}
                         </div>
                         <div>
-                          <p className="font-medium text-gray-800">Mobile Banking</p>
-                          <p className="text-sm text-gray-600">Bkash/Nagad/Rocket</p>
+                          <p className="font-medium text-gray-800 text-[clamp(0.875rem,2.5vw,1rem)]">Mobile Banking</p>
+                          <p className="text-[clamp(0.75rem,2vw,0.875rem)] text-gray-600">Bkash/Nagad/Rocket</p>
                         </div>
                       </div>
                     </label>
@@ -412,7 +412,7 @@ const CartPage = () => {
 
                 {/* Additional Notes */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-[clamp(0.75rem,2vw,0.875rem)] font-medium text-gray-700 mb-2">
                     Additional Notes (Optional)
                   </label>
                   <textarea
@@ -420,7 +420,7 @@ const CartPage = () => {
                     value={customerDetails.additionalNotes}
                     onChange={handleInputChange}
                     rows="2"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[clamp(0.875rem,2.5vw,1rem)]"
                     placeholder="Any special instructions for delivery..."
                   />
                 </div>
@@ -431,14 +431,14 @@ const CartPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowCustomerForm(false)}
-                  className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors text-[clamp(0.875rem,2.5vw,1rem)]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className="flex-1 flex items-center justify-center gap-3 px-6 py-3 bg-linear-to-r from-green-500 to-green-600 text-white rounded-xl font-bold hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="flex-1 flex items-center justify-center gap-3 px-6 py-3 bg-linear-to-r from-green-500 to-green-600 text-white rounded-xl font-bold hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed text-[clamp(0.875rem,2.5vw,1rem)]"
                 >
                   {isProcessing ? (
                     <>
@@ -447,14 +447,14 @@ const CartPage = () => {
                     </>
                   ) : (
                     <>
-                      <FaWhatsapp className="w-5 h-5" />
+                      <FaWhatsapp className="w-5 h-5 shrink-0" />
                       Proceed to WhatsApp
                     </>
                   )}
                 </button>
               </div>
               
-              <p className="mt-4 text-center text-sm text-gray-600">
+              <p className="mt-4 text-center text-[clamp(0.75rem,2vw,0.875rem)] text-gray-600">
                 You'll be redirected to WhatsApp to confirm your order
               </p>
             </form>
@@ -467,23 +467,18 @@ const CartPage = () => {
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-3xl font-bold flex items-center gap-3 text-gray-800">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h1 className="text-[clamp(1.5rem,5vw,2rem)] font-bold flex items-center gap-3 text-gray-800">
                 <div className="p-3 bg-blue-600 text-white rounded-full">
-                  <FaShoppingCart className="w-6 h-6" />
+                  <FaShoppingCart className="w-[clamp(1.25rem,3vw,1.5rem)] h-[clamp(1.25rem,3vw,1.5rem)]" />
                 </div>
                 <span>Your Shopping Cart</span>
-                {cartItems.length > 0 && (
-                  <span className="text-lg font-normal text-gray-600">
-                    ({totalItems} {totalItems === 1 ? 'item' : 'items'})
-                  </span>
-                )}
               </h1>
               
               {cartItems.length > 0 && (
                 <button
                   onClick={handleClearCart}
-                  className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-medium transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-medium transition-colors flex items-center gap-2 text-[clamp(0.875rem,2.5vw,1rem)]"
                 >
                   <FaTrash className="w-4 h-4" />
                   Clear Cart
@@ -493,14 +488,14 @@ const CartPage = () => {
             
             {cartItems.length > 0 && (
               <div className="bg-linear-to-r from-blue-500 to-purple-600 text-white p-4 rounded-xl shadow-lg">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                   <div>
-                    <p className="text-lg font-semibold">Order Summary</p>
-                    <p className="text-blue-100">Complete your purchase via WhatsApp</p>
+                    <p className="text-[clamp(1rem,3vw,1.125rem)] font-semibold">Order Summary</p>
+                    <p className="text-blue-100 text-[clamp(0.75rem,2vw,0.875rem)]">Complete your purchase via WhatsApp</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold">৳ {formatPrice(totalPrice)}</p>
-                    <p className="text-blue-100 text-sm">{totalItems} items</p>
+                  <div className="text-left sm:text-right">
+                    <p className="text-[clamp(1.5rem,4vw,2rem)] font-bold">৳ {formatPrice(totalPrice)}</p>
+                    <p className="text-blue-100 text-[clamp(0.75rem,2vw,0.875rem)]">{totalItems} items</p>
                   </div>
                 </div>
               </div>
@@ -509,17 +504,17 @@ const CartPage = () => {
 
           {/* Cart Items Display */}
           {cartItems.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-2xl shadow-lg">
-              <div className="text-8xl mb-6">📚</div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-3">Your cart is empty</h2>
-              <p className="text-gray-600 text-lg mb-8 max-w-md mx-auto">
+            <div className="text-center py-12 sm:py-20 bg-white rounded-2xl shadow-lg px-4">
+              <div className="text-6xl sm:text-8xl mb-6">📚</div>
+              <h2 className="text-[clamp(1.25rem,5vw,1.5rem)] font-bold text-gray-800 mb-3">Your cart is empty</h2>
+              <p className="text-gray-600 text-[clamp(0.875rem,2.5vw,1rem)] mb-8 max-w-md mx-auto">
                 Looks like you haven't added any books to your cart yet. Start exploring our collection!
               </p>
               <a 
                 href="/books" 
-                className="inline-flex items-center gap-3 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all"
+                className="inline-flex items-center gap-3 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-[clamp(0.875rem,2.5vw,1.125rem)] shadow-lg hover:shadow-xl transition-all"
               >
-                <FaShoppingCart />
+                <FaShoppingCart className="w-[clamp(1rem,2.5vw,1.25rem)] h-[clamp(1rem,2.5vw,1.25rem)]" />
                 Browse Books Collection
               </a>
             </div>
@@ -531,28 +526,28 @@ const CartPage = () => {
                   {cartItems.map((item) => (
                     <div
                       key={item.id}
-                      className="p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors"
+                      className="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                       {/* Book Info */}
                       <div className="flex items-start gap-4 flex-1 mb-4 md:mb-0">
-                        <div className="relative">
+                        <div className="relative shrink-0">
                           <img
                             src={item.image || "/book-placeholder.jpg"}
                             alt={item.title}
-                            className="w-24 h-32 object-cover rounded-xl shadow-md"
+                            className="w-20 h-28 sm:w-24 sm:h-32 object-cover rounded-xl shadow-md"
                           />
                           {item.quantity > 1 && (
-                            <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                            <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-[clamp(0.625rem,1.5vw,0.75rem)] font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
                               {item.quantity}
                             </span>
                           )}
                         </div>
                         
-                        <div className="flex-1">
-                          <h2 className="font-bold text-xl text-gray-800">{item.title}</h2>
-                          <p className="text-gray-600 mb-2">by {item.author || "Unknown Author"}</p>
-                          <p className="text-blue-600 font-bold text-xl">৳ {formatPrice(item.price)}</p>
-                          <p className="text-green-600 font-medium">
+                        <div className="flex-1 min-w-0">
+                          <h2 className="font-bold text-[clamp(1rem,3vw,1.25rem)] text-gray-800 truncate">{item.title}</h2>
+                          <p className="text-gray-600 mb-2 text-[clamp(0.75rem,2vw,0.875rem)]">by {item.author || "Unknown Author"}</p>
+                          <p className="text-blue-600 font-bold text-[clamp(1rem,2.5vw,1.25rem)]">৳ {formatPrice(item.price)}</p>
+                          <p className="text-green-600 font-medium text-[clamp(0.75rem,2vw,0.875rem)]">
                             Subtotal: ৳ {formatPrice(item.price * item.quantity)}
                           </p>
                         </div>
@@ -567,10 +562,10 @@ const CartPage = () => {
                               className={`p-2 rounded-full ${item.quantity <= 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:text-blue-600 hover:bg-white'}`}
                               disabled={item.quantity <= 1}
                             >
-                              <FaMinus className="w-4 h-4" />
+                              <FaMinus className="w-[clamp(0.875rem,2vw,1rem)] h-[clamp(0.875rem,2vw,1rem)]" />
                             </button>
                             
-                            <span className="font-bold text-lg w-8 text-center">
+                            <span className="font-bold text-[clamp(1rem,2.5vw,1.125rem)] w-8 text-center">
                               {item.quantity}
                             </span>
                             
@@ -578,7 +573,7 @@ const CartPage = () => {
                               onClick={() => handleIncrease(item.id)}
                               className="p-2 rounded-full text-gray-700 hover:text-blue-600 hover:bg-white"
                             >
-                              <FaPlus className="w-4 h-4" />
+                              <FaPlus className="w-[clamp(0.875rem,2vw,1rem)] h-[clamp(0.875rem,2vw,1rem)]" />
                             </button>
                           </div>
 
@@ -588,7 +583,7 @@ const CartPage = () => {
                             className="p-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors"
                             title="Remove from cart"
                           >
-                            <FaTrash className="w-5 h-5" />
+                            <FaTrash className="w-[clamp(1rem,2.5vw,1.25rem)] h-[clamp(1rem,2.5vw,1.25rem)]" />
                           </button>
                         </div>
                       </div>
@@ -597,31 +592,31 @@ const CartPage = () => {
                 </div>
 
                 {/* Order Summary */}
-                <div className="bg-linear-to-r from-gray-50 to-blue-50 p-8 border-t border-gray-200">
+                <div className="bg-linear-to-r from-gray-50 to-blue-50 p-4 sm:p-8 border-t border-gray-200">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-800 mb-4">Order Details</h3>
+                      <h3 className="text-[clamp(1rem,3vw,1.25rem)] font-bold text-gray-800 mb-4">Order Details</h3>
                       <div className="space-y-3">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Total Items</span>
-                          <span className="font-medium">{cartItems.length} different books</span>
+                          <span className="text-gray-600 text-[clamp(0.875rem,2.5vw,1rem)]">Total Items</span>
+                          <span className="font-medium text-[clamp(0.875rem,2.5vw,1rem)]">{cartItems.length} different books</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Total Quantity</span>
-                          <span className="font-medium">{totalItems} copies</span>
+                          <span className="text-gray-600 text-[clamp(0.875rem,2.5vw,1rem)]">Total Quantity</span>
+                          <span className="font-medium text-[clamp(0.875rem,2.5vw,1rem)]">{totalItems} copies</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Items Subtotal</span>
-                          <span className="font-medium">৳ {formatPrice(totalPrice)}</span>
+                          <span className="text-gray-600 text-[clamp(0.875rem,2.5vw,1rem)]">Items Subtotal</span>
+                          <span className="font-medium text-[clamp(0.875rem,2.5vw,1rem)]">৳ {formatPrice(totalPrice)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Shipping</span>
-                          <span className="font-medium text-green-600">Free (৳500+ order)</span>
+                          <span className="text-gray-600 text-[clamp(0.875rem,2.5vw,1rem)]">Shipping</span>
+                          <span className="font-medium text-green-600 text-[clamp(0.875rem,2.5vw,1rem)]">Free (৳500+ order)</span>
                         </div>
                         <div className="border-t border-gray-300 pt-3 mt-3">
                           <div className="flex justify-between text-lg">
-                            <span className="font-bold text-gray-800">Total Amount</span>
-                            <span className="font-bold text-blue-600 text-2xl">৳ {formatPrice(totalPrice)}</span>
+                            <span className="font-bold text-gray-800 text-[clamp(1rem,3vw,1.125rem)]">Total Amount</span>
+                            <span className="font-bold text-blue-600 text-[clamp(1.25rem,4vw,1.5rem)]">৳ {formatPrice(totalPrice)}</span>
                           </div>
                         </div>
                       </div>
@@ -629,12 +624,12 @@ const CartPage = () => {
                     
                     <div className="flex flex-col justify-between">
                       <div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-4">Delivery Information</h3>
+                        <h3 className="text-[clamp(1rem,3vw,1.25rem)] font-bold text-gray-800 mb-4">Delivery Information</h3>
                         <div className="space-y-3 text-gray-600">
-                          <p>📦 Free delivery on orders above ৳500</p>
-                          <p>⏱️ 2-3 business days in Dhaka</p>
-                          <p>📞 Contact: +880 1906-884840</p>
-                          <p>💳 Cash on Delivery available</p>
+                          <p className="text-[clamp(0.875rem,2.5vw,1rem)]">📦 Free delivery on orders above ৳500</p>
+                          <p className="text-[clamp(0.875rem,2.5vw,1rem)]">⏱️ 2-3 business days in Dhaka</p>
+                          <p className="text-[clamp(0.875rem,2.5vw,1rem)]">📞 Contact: +880 1906-884840</p>
+                          <p className="text-[clamp(0.875rem,2.5vw,1rem)]">💳 Cash on Delivery available</p>
                         </div>
                       </div>
                     </div>
@@ -647,9 +642,9 @@ const CartPage = () => {
                 <button
                   onClick={handleWhatsAppCheckout}
                   disabled={cartItems.length === 0}
-                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-linear-to-r from-green-500 to-green-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-linear-to-r from-green-500 to-green-600 text-white rounded-xl font-bold text-[clamp(1rem,3vw,1.125rem)] shadow-lg hover:shadow-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <FaWhatsapp className="w-6 h-6" />
+                  <FaWhatsapp className="w-[clamp(1.25rem,3vw,1.5rem)] h-[clamp(1.25rem,3vw,1.5rem)] shrink-0" />
                   Proceed to Checkout via WhatsApp
                 </button>
               </div>

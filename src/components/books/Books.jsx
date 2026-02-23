@@ -125,13 +125,13 @@ export default function HomePage() {
           {/* Badges - smaller */}
           <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10">
             {discount > 0 && (
-              <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-md">
+              <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-2.5 py-0.5 rounded-full text-[clamp(0.625rem,1.5vw,0.75rem)] font-bold shadow-md">
                 -{discount}%
               </span>
             )}
             {book.bestseller && (
-              <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-md flex items-center">
-                <TrendingUp className="w-3 h-3 mr-1" /> বেস্টসেলার
+              <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-2.5 py-0.5 rounded-full text-[clamp(0.625rem,1.5vw,0.75rem)] font-bold shadow-md flex items-center">
+                <TrendingUp className="w-[clamp(0.75rem,1.5vw,0.875rem)] h-[clamp(0.75rem,1.5vw,0.875rem)] mr-1" /> বেস্টসেলার
               </span>
             )}
           </div>
@@ -140,10 +140,10 @@ export default function HomePage() {
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
             <div className="flex flex-col gap-1.5">
               <button className="p-1.5 bg-white/90 backdrop-blur rounded-full hover:bg-white shadow">
-                <Heart className="w-4 h-4 text-gray-700" />
+                <Heart className="w-[clamp(0.875rem,2vw,1rem)] h-[clamp(0.875rem,2vw,1rem)] text-gray-700" />
               </button>
               <button className="p-1.5 bg-white/90 backdrop-blur rounded-full hover:bg-white shadow">
-                <Eye className="w-4 h-4 text-gray-700" />
+                <Eye className="w-[clamp(0.875rem,2vw,1rem)] h-[clamp(0.875rem,2vw,1rem)] text-gray-700" />
               </button>
             </div>
           </div>
@@ -152,11 +152,11 @@ export default function HomePage() {
         {/* Details - more compact */}
         <div className="p-4 flex flex-col flex-grow">
           <Link href={`/books/${book._id}`}>
-            <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1.5 line-clamp-2 hover:text-blue-600 transition-colors">
+            <h3 className="font-bold text-[clamp(0.875rem,2.5vw,1.125rem)] text-gray-900 mb-1.5 line-clamp-2 hover:text-blue-600 transition-colors">
               {book.title}
             </h3>
           </Link>
-          <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-1">
+          <p className="text-gray-600 text-[clamp(0.75rem,2vw,0.875rem)] mb-2 line-clamp-1">
             by {book.author}
           </p>
 
@@ -165,27 +165,27 @@ export default function HomePage() {
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-3.5 h-3.5 ${i < Math.floor(book.rating || 0) ? 'fill-current' : ''}`}
+                  className={`w-[clamp(0.875rem,2vw,1rem)] h-[clamp(0.875rem,2vw,1rem)] ${i < Math.floor(book.rating || 0) ? 'fill-current' : ''}`}
                 />
               ))}
             </div>
-            <span className="ml-1.5 text-xs text-gray-600">({book.rating?.toFixed(1) || 0})</span>
+            <span className="ml-1.5 text-[clamp(0.625rem,1.5vw,0.75rem)] text-gray-600">({book.rating?.toFixed(1) || 0})</span>
           </div>
 
           <div className="mt-auto flex items-center justify-between">
             <div>
               {discount > 0 && (
-                <span className="text-xs text-gray-500 line-through block">
+                <span className="text-[clamp(0.625rem,1.5vw,0.75rem)] text-gray-500 line-through block">
                   {formatPrice(originalPrice)}
                 </span>
               )}
-              <span className="text-xl sm:text-2xl font-bold text-blue-600">
+              <span className="text-[clamp(1.125rem,3vw,1.5rem)] font-bold text-blue-600">
                 {formatPrice(finalPrice)}
               </span>
             </div>
             <Link
               href={`/books/${book._id}`}
-              className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-xs sm:text-sm font-medium hover:opacity-90 transition"
+              className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-[clamp(0.75rem,2vw,0.875rem)] font-medium hover:opacity-90 transition"
             >
               বিস্তারিত
             </Link>
@@ -225,10 +225,10 @@ export default function HomePage() {
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                <h2 className="text-[clamp(1.25rem,4vw,1.875rem)] font-bold text-gray-900">
                   {category.displayName || category.name}
                 </h2>
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-600 mt-1 text-[clamp(0.75rem,2vw,0.875rem)]">
                   {category.bookCount || books.length}+ বই এই ক্যাটাগরিতে
                 </p>
               </div>
@@ -237,7 +237,7 @@ export default function HomePage() {
 
           <Link
             href={`/books?category=${category.name}`}
-            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium hover:opacity-90 transition group"
+            className="inline-flex items-center px-[clamp(1rem,3vw,1.5rem)] py-[clamp(0.5rem,1.5vw,0.75rem)] bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium hover:opacity-90 transition group text-[clamp(0.875rem,2vw,1rem)]"
           >
             সব বই দেখুন
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -287,8 +287,8 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6"
             >
-              <Sparkles className="w-5 h-5 mr-2" />
-              <span className="font-medium">
+              <Sparkles className="w-[clamp(1rem,3vw,1.25rem)] h-[clamp(1rem,3vw,1.25rem)] mr-2" />
+              <span className="font-medium text-[clamp(0.75rem,2.5vw,1rem)]">
                 বাংলাদেশের বৃহত্তম অনলাইন বইয়ের দোকান
               </span>
             </motion.div>
@@ -297,7 +297,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+              className="text-[clamp(2rem,8vw,4.5rem)] font-bold mb-6 leading-tight"
             >
               পড়ুন, জানুন,
               <span className="block text-yellow-300">বিকশিত হোন</span>
@@ -307,7 +307,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto"
+              className="text-[clamp(0.875rem,3vw,1.25rem)] text-gray-300 mb-10 max-w-2xl mx-auto"
             >
               ১০,০০০+ বইয়ের বিশাল সংগ্রহ থেকে আপনার পছন্দের বই খুঁজে নিন। হোম
               ডেলিভারি সহ দেশব্যাপী সেবা।
@@ -321,14 +321,14 @@ export default function HomePage() {
             >
               <Link
                 href="/books"
-                className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 font-bold rounded-xl hover:shadow-2xl transition-shadow flex items-center justify-center"
+                className="px-[clamp(1.5rem,4vw,2rem)] py-[clamp(0.75rem,2vw,1rem)] bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 font-bold rounded-xl hover:shadow-2xl transition-shadow flex items-center justify-center text-[clamp(0.875rem,2.5vw,1rem)]"
               >
-                <BookOpen className="w-5 h-5 mr-2" />
+                <BookOpen className="w-[clamp(1rem,2.5vw,1.25rem)] h-[clamp(1rem,2.5vw,1.25rem)] mr-2" />
                 সব বই দেখুন
               </Link>
               <Link
                 href="/books?featured=true"
-                className="px-8 py-4 border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition-colors"
+                className="px-[clamp(1.5rem,4vw,2rem)] py-[clamp(0.75rem,2vw,1rem)] border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition-colors text-[clamp(0.875rem,2.5vw,1rem)]"
               >
                 ফিচার্ড বই
               </Link>
@@ -342,15 +342,15 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-16">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-10">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-                <Award className="w-8 h-8 text-yellow-500 mr-3" />
+              <h2 className="text-[clamp(1.5rem,5vw,2rem)] font-bold text-gray-900 mb-2 flex items-center">
+                <Award className="w-[clamp(1.5rem,4vw,2rem)] h-[clamp(1.5rem,4vw,2rem)] text-yellow-500 mr-3" />
                 ফিচার্ড বইসমূহ
               </h2>
-              <p className="text-gray-600">এই সপ্তাহের সবচেয়ে জনপ্রিয় বইগুলো</p>
+              <p className="text-gray-600 text-[clamp(0.875rem,2.5vw,1rem)]">এই সপ্তাহের সবচেয়ে জনপ্রিয় বইগুলো</p>
             </div>
             <Link
               href="/books?featured=true"
-              className="mt-4 md:mt-0 text-blue-600 hover:text-blue-700 font-medium flex items-center"
+              className="mt-4 md:mt-0 text-blue-600 hover:text-blue-700 font-medium flex items-center text-[clamp(0.875rem,2.5vw,1rem)]"
             >
               আরও দেখুন
               <ArrowRight className="w-4 h-4 ml-2" />
@@ -393,10 +393,10 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <stat.icon className="w-8 h-8 text-blue-600" />
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-2">
+                <div className="text-[clamp(1.5rem,5vw,1.875rem)] font-bold text-gray-900 mb-2">
                   {stat.value}
                 </div>
-                <div className="text-gray-600">{stat.label}</div>
+                <div className="text-[clamp(0.875rem,2.5vw,1rem)] text-gray-600">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -408,7 +408,7 @@ export default function HomePage() {
         {/* Categories Navigation */}
         {categories.length > 0 && (
           <div className="mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">
+            <h2 className="text-[clamp(1.5rem,5vw,2rem)] font-bold text-gray-900 mb-10 text-center">
               ক্যাটাগরি অনুযায়ী বই
             </h2>
 
@@ -446,7 +446,7 @@ export default function HomePage() {
                 <div className="flex gap-3 mx-auto">
                   <button
                     onClick={() => setActiveCategory("all")}
-                    className={`flex-shrink-0 px-6 py-3 rounded-full font-medium transition-all whitespace-nowrap ${
+                    className={`flex-shrink-0 px-[clamp(1rem,3vw,1.5rem)] py-[clamp(0.5rem,1.5vw,0.75rem)] rounded-full font-medium transition-all whitespace-nowrap text-[clamp(0.875rem,2vw,1rem)] ${
                       activeCategory === "all"
                         ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -459,7 +459,7 @@ export default function HomePage() {
                     <button
                       key={category._id}
                       onClick={() => setActiveCategory(category.name)}
-                      className={`flex-shrink-0 px-6 py-3 rounded-full font-medium transition-all whitespace-nowrap ${
+                      className={`flex-shrink-0 px-[clamp(1rem,3vw,1.5rem)] py-[clamp(0.5rem,1.5vw,0.75rem)] rounded-full font-medium transition-all whitespace-nowrap text-[clamp(0.875rem,2vw,1rem)] ${
                         activeCategory === category.name
                           ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -470,7 +470,7 @@ export default function HomePage() {
                   ))}
 
                   {categories.length > CATEGORIES_PER_VIEW && (
-                    <div className="flex-shrink-0 px-4 py-3 text-gray-500 font-medium">
+                    <div className="flex-shrink-0 px-4 py-3 text-gray-500 font-medium text-[clamp(0.875rem,2vw,1rem)]">
                       {categoryOffset + CATEGORIES_PER_VIEW} / {categories.length}
                     </div>
                   )}
@@ -484,7 +484,7 @@ export default function HomePage() {
         {categoriesLoading ? (
           <div className="text-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">ক্যাটাগরি লোড হচ্ছে...</p>
+            <p className="text-gray-600 text-[clamp(0.875rem,2.5vw,1rem)]">ক্যাটাগরি লোড হচ্ছে...</p>
           </div>
         ) : activeCategory === "all" ? (
           // Show all categories
@@ -507,22 +507,22 @@ export default function HomePage() {
           viewport={{ once: true }}
           className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl p-8 md:p-12 text-white text-center mt-20 shadow-2xl"
         >
-          <h3 className="text-3xl font-bold mb-4">
+          <h3 className="text-[clamp(1.5rem,5vw,2rem)] font-bold mb-4">
             আপনার পছন্দের বই এখনই সংগ্রহ করুন
           </h3>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
+          <p className="text-[clamp(1rem,3vw,1.25rem)] mb-8 max-w-2xl mx-auto">
             ৫০০+ টাকার অর্ডারে ফ্রি ডেলিভারি এবং ৭ দিনের রিটার্ন পলিসি
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/books"
-              className="px-8 py-4 bg-white text-blue-600 font-bold rounded-xl hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl"
+              className="px-[clamp(1.5rem,4vw,2rem)] py-[clamp(0.75rem,2vw,1rem)] bg-white text-blue-600 font-bold rounded-xl hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl text-[clamp(0.875rem,2.5vw,1rem)]"
             >
               সব বই ব্রাউজ করুন
             </Link>
             <Link
               href="/books?bestseller=true"
-              className="px-8 py-4 border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition-colors"
+              className="px-[clamp(1.5rem,4vw,2rem)] py-[clamp(0.75rem,2vw,1rem)] border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition-colors text-[clamp(0.875rem,2.5vw,1rem)]"
             >
               বেস্টসেলার দেখুন
             </Link>
@@ -535,20 +535,20 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-12">
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <h4 className="text-xl font-bold mb-4">দ্রুত ডেলিভারি</h4>
-              <p className="text-gray-400">
+              <h4 className="text-[clamp(1.125rem,3vw,1.25rem)] font-bold mb-4">দ্রুত ডেলিভারি</h4>
+              <p className="text-gray-400 text-[clamp(0.875rem,2.5vw,1rem)]">
                 ঢাকা শহরে ২৪ ঘন্টায়, অন্যান্য বিভাগে ২-৩ কর্মদিবসে
               </p>
             </div>
             <div>
-              <h4 className="text-xl font-bold mb-4">সুরক্ষিত পেমেন্ট</h4>
-              <p className="text-gray-400">
+              <h4 className="text-[clamp(1.125rem,3vw,1.25rem)] font-bold mb-4">সুরক্ষিত পেমেন্ট</h4>
+              <p className="text-gray-400 text-[clamp(0.875rem,2.5vw,1rem)]">
                 SSL সিকিউরড পেমেন্ট গেটওয়ে দিয়ে নিরাপদ লেনদেন
               </p>
             </div>
             <div>
-              <h4 className="text-xl font-bold mb-4">২৪/৭ সাপোর্ট</h4>
-              <p className="text-gray-400">
+              <h4 className="text-[clamp(1.125rem,3vw,1.25rem)] font-bold mb-4">২৪/৭ সাপোর্ট</h4>
+              <p className="text-gray-400 text-[clamp(0.875rem,2.5vw,1rem)]">
                 যেকোনো সমস্যায় কল করুন: ০১৬XX-XXXXXX
               </p>
             </div>

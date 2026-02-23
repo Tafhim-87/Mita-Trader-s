@@ -53,33 +53,33 @@ export const Hero = () => {
           transition={{ duration: 0.7 }}
           className="space-y-5 sm:space-y-6 text-center md:text-left"
         >
-          <span className="inline-block px-3 sm:px-4 py-1 text-xs sm:text-sm rounded-full bg-indigo-50 text-indigo-600 font-medium">
+          <span className="inline-block px-3 sm:px-4 py-1 text-[clamp(0.75rem,2vw,0.875rem)] rounded-full bg-indigo-50 text-indigo-600 font-medium">
             📘 Best Book of the Month
           </span>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-[clamp(1.875rem,5vw,3.75rem)] font-bold text-gray-900 leading-tight">
            পড়ো বেশি, জানো বেশি,  <span className="text-indigo-600">যাও বেশি দূর।</span>
           </h1>
 
-          <p className="text-gray-600 max-w-lg mx-auto md:mx-0 text-base sm:text-lg">
+          <p className="text-gray-600 max-w-lg mx-auto md:mx-0 text-[clamp(0.875rem,2.5vw,1.125rem)]">
             হাতে বাছাই করা বই যা তোমাকে বেশি জানতে সাহায্য করে এবং জীবনে বেশি দূর যেতে উৎসাহ দেয়।
           </p>
 
           <div className="pt-2">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
+            <h2 className="text-[clamp(1.25rem,3vw,1.875rem)] font-semibold text-gray-800">
               {featuredBook.title}
             </h2>
-            <p className="text-gray-500 mt-1 text-sm sm:text-base">
+            <p className="text-gray-500 mt-1 text-[clamp(0.75rem,2vw,0.875rem)]">
               by {featuredBook.author}
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row flex-wrap gap-4 pt-4 sm:pt-6 justify-center md:justify-start">
-            <button className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-lg font-medium text-sm sm:text-base">
+            <button className="px-[clamp(1.25rem,3vw,2rem)] py-[clamp(0.75rem,2vw,1rem)] rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-lg font-medium text-[clamp(0.875rem,2vw,1rem)]">
               Buy Now • ৳{featuredBook.price}
             </button>
 
-            <button className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition font-medium text-sm sm:text-base">
+            <button className="px-[clamp(1.25rem,3vw,2rem)] py-[clamp(0.75rem,2vw,1rem)] rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition font-medium text-[clamp(0.875rem,2vw,1rem)]">
               Explore All Books
             </button>
           </div>
@@ -141,34 +141,30 @@ export const Hero = () => {
             {books.map((book) => (
               <SwiperSlide
                 key={book._id}
-                className="!w-[260px] sm:!w-[280px] md:!w-[300px] lg:!w-[320px]"
+                className="!w-[clamp(220px,40vw,320px)]"
               >
-                <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl sm:shadow-2xl h-full">
-                  {/* Removed bg-white – let the image be the background */}
-
-                  {/* <div className="relative w-full h-[380px] sm:h-[420px] md:h-[460px]"> */}
-                    <Image
-                      src={book.images?.[0]?.url || "/placeholder-book.jpg"}
-                      alt={book.title}
-                      fill
-                      sizes="(max-width: 640px) 260px, (max-width: 1024px) 300px, 320px"
-                      className="object-cover" // ← this is key: fills the area, crops if needed
-                      priority={book._id === featuredBook._id}
-                    />
-                  {/* </div> */}
+                <div className="relative rounded-[clamp(1rem,3vw,1.5rem)] overflow-hidden shadow-xl sm:shadow-2xl h-full">
+                  <Image
+                    src={book.images?.[0]?.url || "/placeholder-book.jpg"}
+                    alt={book.title}
+                    fill
+                    sizes="(max-width: 640px) 220px, (max-width: 1024px) 280px, 320px"
+                    className="object-cover"
+                    priority={book._id === featuredBook._id}
+                  />
 
                   {/* Info Overlay – moved slightly higher if needed, semi-transparent bg */}
-                  <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 bg-red-50/85 backdrop-blur-md rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md">
-                    <h3 className="font-bold text-gray-900 text-base sm:text-lg line-clamp-2">
+                  <div className="absolute bottom-[clamp(0.5rem,2vw,1rem)] left-[clamp(0.5rem,2vw,1rem)] right-[clamp(0.5rem,2vw,1rem)] bg-red-50/85 backdrop-blur-md rounded-[clamp(0.5rem,1.5vw,0.75rem)] p-[clamp(0.75rem,2vw,1rem)] shadow-md">
+                    <h3 className="font-bold text-gray-900 text-[clamp(0.875rem,2vw,1.125rem)] line-clamp-2">
                       {book.title}
                     </h3>
 
-                    <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
+                    <p className="text-[clamp(0.75rem,1.5vw,0.875rem)] text-gray-600 mt-0.5">
                       ★ {book.rating?.toFixed(1)} • ৳{book.price}
                     </p>
 
                     {book.discount > 0 && (
-                      <span className="text-green-600 font-medium text-xs sm:text-sm block mt-1">
+                      <span className="text-green-600 font-medium text-[clamp(0.75rem,1.5vw,0.875rem)] block mt-1">
                         {book.discount}% OFF
                       </span>
                     )}

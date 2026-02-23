@@ -248,7 +248,7 @@ export default function BooksPageContent() {
       .replace("BDT", "৳");
   };
 
-  // SMALLER BOOK CARD COMPONENT - Consistent Height
+  // SMALLER BOOK CARD COMPONENT - Consistent Height with clamp
   const BookCard = ({ book, viewMode = "grid" }) => {
     const originalPrice = Number(book.price) || 0;
     const discount = Number(book.discount) || 0;
@@ -269,7 +269,7 @@ export default function BooksPageContent() {
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <BookOpen className="w-10 h-10 text-gray-400" />
+                    <BookOpen className="w-[clamp(1.5rem,4vw,2.5rem)] h-[clamp(1.5rem,4vw,2.5rem)] text-gray-400" />
                   </div>
                 )}
               </div>
@@ -279,39 +279,39 @@ export default function BooksPageContent() {
             <div className="flex-1 p-4">
               <div className="h-full flex flex-col">
                 <Link href={`/books/${book._id}`}>
-                  <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 line-clamp-2 text-sm">
+                  <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 line-clamp-2 text-[clamp(0.875rem,2vw,1rem)]">
                     {book.title}
                   </h3>
                 </Link>
-                <p className="text-gray-600 text-xs mb-2 line-clamp-1">{book.author}</p>
+                <p className="text-gray-600 text-[clamp(0.75rem,1.5vw,0.875rem)] mb-2 line-clamp-1">{book.author}</p>
 
                 <div className="flex items-center mb-3">
                   <div className="flex text-yellow-400">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-3 h-3 ${i < Math.floor(book.rating || 0) ? "fill-current" : ""}`}
+                        className={`w-[clamp(0.75rem,1.5vw,0.875rem)] h-[clamp(0.75rem,1.5vw,0.875rem)] ${i < Math.floor(book.rating || 0) ? "fill-current" : ""}`}
                       />
                     ))}
                   </div>
-                  <span className="ml-1 text-xs text-gray-600">({book.rating || 0})</span>
+                  <span className="ml-1 text-[clamp(0.625rem,1.5vw,0.75rem)] text-gray-600">({book.rating || 0})</span>
                 </div>
 
                 <div className="mt-auto">
                   <div className="flex items-center justify-between">
                     <div>
                       {discount > 0 && (
-                        <span className="text-xs text-gray-500 line-through block">
+                        <span className="text-[clamp(0.625rem,1.5vw,0.75rem)] text-gray-500 line-through block">
                           {formatPrice(originalPrice)}
                         </span>
                       )}
-                      <span className="text-lg font-bold text-blue-600">
+                      <span className="text-[clamp(1rem,2.5vw,1.25rem)] font-bold text-blue-600">
                         {formatPrice(finalPrice)}
                       </span>
                     </div>
                     <Link
                       href={`/books/${book._id}`}
-                      className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                      className="px-3 py-1.5 bg-blue-600 text-white rounded text-[clamp(0.75rem,1.5vw,0.875rem)] hover:bg-blue-700"
                     >
                       বিস্তারিত
                     </Link>
@@ -324,7 +324,7 @@ export default function BooksPageContent() {
       );
     }
 
-    // GRID VIEW - Smaller and Consistent Height
+    // GRID VIEW - Smaller and Consistent Height with clamp
     return (
       <div className="bg-white rounded-lg shadow hover:shadow-md transition-all h-full flex flex-col">
         {/* Book Cover - Smaller */}
@@ -338,19 +338,19 @@ export default function BooksPageContent() {
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
-                <BookOpen className="w-12 h-12 text-gray-300" />
+                <BookOpen className="w-[clamp(2rem,5vw,3rem)] h-[clamp(2rem,5vw,3rem)] text-gray-300" />
               </div>
             )}
 
             {/* Badges - Smaller */}
             <div className="absolute top-2 left-2 flex flex-col gap-1">
               {discount > 0 && (
-                <span className="bg-red-500 text-white px-2 py-0.5 rounded text-xs font-bold">
+                <span className="bg-red-500 text-white px-2 py-0.5 rounded text-[clamp(0.625rem,1.5vw,0.75rem)] font-bold">
                   -{discount}%
                 </span>
               )}
               {book.bestseller && (
-                <span className="bg-yellow-500 text-white px-2 py-0.5 rounded text-xs font-bold">
+                <span className="bg-yellow-500 text-white px-2 py-0.5 rounded text-[clamp(0.625rem,1.5vw,0.75rem)] font-bold">
                   বেস্টসেলার
                 </span>
               )}
@@ -361,23 +361,23 @@ export default function BooksPageContent() {
         {/* Book Details - Fixed Height Container */}
         <div className="p-3 flex flex-col flex-1">
           <Link href={`/books/${book._id}`}>
-            <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 line-clamp-2 text-sm min-h-[2.5rem]">
+            <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 line-clamp-2 text-[clamp(0.875rem,2vw,1rem)] min-h-[2.5rem]">
               {book.title}
             </h3>
           </Link>
 
-          <p className="text-gray-600 text-xs mb-2 line-clamp-1">{book.author}</p>
+          <p className="text-gray-600 text-[clamp(0.75rem,1.5vw,0.875rem)] mb-2 line-clamp-1">{book.author}</p>
 
           <div className="flex items-center mb-3">
             <div className="flex text-yellow-400">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-3 h-3 ${i < Math.floor(book.rating || 0) ? "fill-current" : ""}`}
+                  className={`w-[clamp(0.75rem,1.5vw,0.875rem)] h-[clamp(0.75rem,1.5vw,0.875rem)] ${i < Math.floor(book.rating || 0) ? "fill-current" : ""}`}
                 />
               ))}
             </div>
-            <span className="ml-1 text-xs text-gray-600">({book.rating || 0})</span>
+            <span className="ml-1 text-[clamp(0.625rem,1.5vw,0.75rem)] text-gray-600">({book.rating || 0})</span>
           </div>
 
           {/* Price and Button - Fixed at bottom */}
@@ -385,16 +385,16 @@ export default function BooksPageContent() {
             <div className="flex items-center justify-between">
               <div>
                 {discount > 0 && (
-                  <span className="text-xs text-gray-500 line-through block">
+                  <span className="text-[clamp(0.625rem,1.5vw,0.75rem)] text-gray-500 line-through block">
                     {formatPrice(originalPrice)}
                   </span>
                 )}
-                <span className="text-base font-bold text-blue-600">
+                <span className="text-[clamp(1rem,2.5vw,1.125rem)] font-bold text-blue-600">
                   {formatPrice(finalPrice)}
                 </span>
               </div>
 
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+              <span className="text-[clamp(0.625rem,1.5vw,0.75rem)] bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
                 {book.category}
               </span>
             </div>
@@ -402,7 +402,7 @@ export default function BooksPageContent() {
             {/* View Details Button - Always visible, smaller */}
             <Link
               href={`/books/${book._id}`}
-              className="block w-full mt-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 text-center"
+              className="block w-full mt-3 py-1.5 bg-blue-600 text-white rounded text-[clamp(0.75rem,1.5vw,0.875rem)] hover:bg-blue-700 text-center"
             >
               বিস্তারিত দেখুন
             </Link>
@@ -418,8 +418,8 @@ export default function BooksPageContent() {
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">সমস্ত বই</h1>
-            <p className="text-lg mb-8">
+            <h1 className="text-[clamp(2rem,6vw,3rem)] font-bold mb-4">সমস্ত বই</h1>
+            <p className="text-[clamp(1rem,3vw,1.125rem)] mb-8">
               {pagination.totalItems
                 ? `${pagination.totalItems} বই পাওয়া গেছে`
                 : "আপনার পছন্দের বই খুঁজুন"}
@@ -434,13 +434,13 @@ export default function BooksPageContent() {
                   setFilters(prev => ({ ...prev, search: e.target.value }))
                 }
                 placeholder="বই, লেখক বা ক্যাটাগরি খুঁজুন..."
-                className="w-full px-6 py-4 pr-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full px-6 py-4 pr-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-[clamp(0.875rem,2.5vw,1rem)]"
               />
               <button
                 type="submit"
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 bg-yellow-400 text-gray-900 rounded-lg hover:bg-yellow-300"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-[clamp(1rem,2.5vw,1.25rem)] h-[clamp(1rem,2.5vw,1.25rem)]" />
               </button>
             </form>
           </div>
@@ -453,9 +453,9 @@ export default function BooksPageContent() {
           <div className="lg:hidden flex items-center justify-between mb-4">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center px-4 py-2 bg-white rounded-lg shadow"
+              className="flex items-center px-4 py-2 bg-white rounded-lg shadow text-[clamp(0.875rem,2.5vw,1rem)]"
             >
-              <Filter className="w-5 h-5 mr-2" />
+              <Filter className="w-[clamp(1rem,2.5vw,1.25rem)] h-[clamp(1rem,2.5vw,1.25rem)] mr-2" />
               ফিল্টার
               {showFilters ? (
                 <ChevronUp className="w-4 h-4 ml-2" />
@@ -469,13 +469,13 @@ export default function BooksPageContent() {
                 onClick={() => setViewMode("grid")}
                 className={`p-2 rounded ${viewMode === "grid" ? "bg-blue-100 text-blue-600" : "bg-gray-100"}`}
               >
-                <Grid className="w-5 h-5" />
+                <Grid className="w-[clamp(1rem,2.5vw,1.25rem)] h-[clamp(1rem,2.5vw,1.25rem)]" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
                 className={`p-2 rounded ${viewMode === "list" ? "bg-blue-100 text-blue-600" : "bg-gray-100"}`}
               >
-                <List className="w-5 h-5" />
+                <List className="w-[clamp(1rem,2.5vw,1.25rem)] h-[clamp(1rem,2.5vw,1.25rem)]" />
               </button>
             </div>
           </div>
@@ -491,10 +491,10 @@ export default function BooksPageContent() {
               >
                 <div className="bg-white overflow-auto rounded-xl shadow-lg p-6 sticky top-24">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold">ফিল্টার</h2>
+                    <h2 className="text-[clamp(1.125rem,3vw,1.25rem)] font-bold">ফিল্টার</h2>
                     <button
                       onClick={clearFilters}
-                      className="text-sm text-blue-600 hover:text-blue-700 flex items-center"
+                      className="text-[clamp(0.75rem,2vw,0.875rem)] text-blue-600 hover:text-blue-700 flex items-center"
                     >
                       <RefreshCw className="w-4 h-4 mr-1" />
                       রিসেট
@@ -503,11 +503,11 @@ export default function BooksPageContent() {
 
                   {/* Sort Options */}
                   <div className="mb-6">
-                    <h3 className="font-bold mb-3">সর্ট করুন</h3>
+                    <h3 className="font-bold mb-3 text-[clamp(0.875rem,2.5vw,1rem)]">সর্ট করুন</h3>
                     <select
                       value={filters.sortBy}
                       onChange={(e) => handleFilterChange("sortBy", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-[clamp(0.875rem,2vw,1rem)]"
                     >
                       {SORT_OPTIONS.map((option) => (
                         <option key={option.id} value={option.id}>
@@ -523,7 +523,7 @@ export default function BooksPageContent() {
                       className="flex items-center justify-between cursor-pointer mb-3"
                       onClick={() => toggleSection("categories")}
                     >
-                      <h3 className="font-bold">ক্যাটাগরি</h3>
+                      <h3 className="font-bold text-[clamp(0.875rem,2.5vw,1rem)]">ক্যাটাগরি</h3>
                       {expandedSections.categories ? (
                         <ChevronUp className="w-4 h-4" />
                       ) : (
@@ -555,10 +555,10 @@ export default function BooksPageContent() {
                                   onChange={() => toggleCategory(category.name)}
                                   className="w-4 h-4 text-blue-600 rounded"
                                 />
-                                <span className="ml-3 flex-1">
+                                <span className="ml-3 flex-1 text-[clamp(0.875rem,2vw,0.9375rem)]">
                                   {category.displayName || category.name}
                                 </span>
-                                <span className="text-sm text-gray-500">
+                                <span className="text-[clamp(0.75rem,1.5vw,0.875rem)] text-gray-500">
                                   ({category.bookCount || 0})
                                 </span>
                               </label>
@@ -575,7 +575,7 @@ export default function BooksPageContent() {
                       className="flex items-center justify-between cursor-pointer mb-3"
                       onClick={() => toggleSection("price")}
                     >
-                      <h3 className="font-bold">দাম</h3>
+                      <h3 className="font-bold text-[clamp(0.875rem,2.5vw,1rem)]">দাম</h3>
                       {expandedSections.price ? (
                         <ChevronUp className="w-4 h-4" />
                       ) : (
@@ -593,7 +593,7 @@ export default function BooksPageContent() {
                         >
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="text-sm text-gray-600 mb-1 block">
+                              <label className="text-[clamp(0.75rem,1.5vw,0.875rem)] text-gray-600 mb-1 block">
                                 ন্যূনতম
                               </label>
                               <input
@@ -601,11 +601,11 @@ export default function BooksPageContent() {
                                 value={filters.minPrice}
                                 onChange={(e) => handleFilterChange("minPrice", e.target.value)}
                                 placeholder="0"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-[clamp(0.875rem,2vw,1rem)]"
                               />
                             </div>
                             <div>
-                              <label className="text-sm text-gray-600 mb-1 block">
+                              <label className="text-[clamp(0.75rem,1.5vw,0.875rem)] text-gray-600 mb-1 block">
                                 সর্বোচ্চ
                               </label>
                               <input
@@ -613,7 +613,7 @@ export default function BooksPageContent() {
                                 value={filters.maxPrice}
                                 onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
                                 placeholder="10000"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-[clamp(0.875rem,2vw,1rem)]"
                               />
                             </div>
                           </div>
@@ -623,7 +623,7 @@ export default function BooksPageContent() {
                               <button
                                 key={`${range.min}-${range.max}`}
                                 onClick={() => handlePriceRange(range.min, range.max)}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+                                className={`w-full text-left px-3 py-2 rounded-lg text-[clamp(0.875rem,2vw,0.9375rem)] ${
                                   filters.minPrice === range.min.toString() &&
                                   filters.maxPrice === range.max.toString()
                                     ? "bg-blue-50 text-blue-600 border border-blue-200"
@@ -645,7 +645,7 @@ export default function BooksPageContent() {
                       className="flex items-center justify-between cursor-pointer mb-3"
                       onClick={() => toggleSection("rating")}
                     >
-                      <h3 className="font-bold">রেটিং</h3>
+                      <h3 className="font-bold text-[clamp(0.875rem,2.5vw,1rem)]">রেটিং</h3>
                       {expandedSections.rating ? (
                         <ChevronUp className="w-4 h-4" />
                       ) : (
@@ -675,7 +675,7 @@ export default function BooksPageContent() {
                                       : option.value.toString()
                                   )
                                 }
-                                className={`w-full text-left px-3 py-2 rounded-lg flex items-center justify-between transition ${
+                                className={`w-full text-left px-3 py-2 rounded-lg flex items-center justify-between transition text-[clamp(0.875rem,2vw,0.9375rem)] ${
                                   filters.minRating === option.value.toString()
                                     ? "bg-yellow-50 text-yellow-600 border border-yellow-200"
                                     : "hover:bg-gray-50"
@@ -701,7 +701,7 @@ export default function BooksPageContent() {
                       className="flex items-center justify-between cursor-pointer mb-3"
                       onClick={() => toggleSection("special")}
                     >
-                      <h3 className="font-bold">বিশেষ ফিল্টার</h3>
+                      <h3 className="font-bold text-[clamp(0.875rem,2.5vw,1rem)]">বিশেষ ফিল্টার</h3>
                       {expandedSections.special ? (
                         <ChevronUp className="w-4 h-4" />
                       ) : (
@@ -726,7 +726,7 @@ export default function BooksPageContent() {
                               }
                               className="w-4 h-4 text-blue-600 rounded"
                             />
-                            <span className="ml-3 flex items-center">
+                            <span className="ml-3 flex items-center text-[clamp(0.875rem,2vw,0.9375rem)]">
                               <Award className="w-4 h-4 mr-2 text-blue-500" />
                               ফিচার্ড বই
                             </span>
@@ -741,7 +741,7 @@ export default function BooksPageContent() {
                               }
                               className="w-4 h-4 text-blue-600 rounded"
                             />
-                            <span className="ml-3 flex items-center">
+                            <span className="ml-3 flex items-center text-[clamp(0.875rem,2vw,0.9375rem)]">
                               <Flame className="w-4 h-4 mr-2 text-orange-500" />
                               বেস্টসেলার
                             </span>
@@ -767,17 +767,17 @@ export default function BooksPageContent() {
               filters.bestseller) && (
               <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium">সক্রিয় ফিল্টার:</h3>
+                  <h3 className="font-medium text-[clamp(0.875rem,2.5vw,1rem)]">সক্রিয় ফিল্টার:</h3>
                   <button
                     onClick={clearFilters}
-                    className="text-sm text-red-600 hover:text-red-700"
+                    className="text-[clamp(0.75rem,2vw,0.875rem)] text-red-600 hover:text-red-700"
                   >
                     সব সরান
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {filters.search && (
-                    <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                    <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)]">
                       সার্চ: "{filters.search}"
                       <button
                         onClick={() => handleFilterChange("search", "")}
@@ -791,7 +791,7 @@ export default function BooksPageContent() {
                   {filters.category.map((cat) => (
                     <span
                       key={cat}
-                      className="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
+                      className="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)]"
                     >
                       <Tag className="w-3 h-3 mr-1" />
                       {cat}
@@ -805,7 +805,7 @@ export default function BooksPageContent() {
                   ))}
 
                   {filters.minRating && (
-                    <span className="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">
+                    <span className="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)]">
                       <Star className="w-3 h-3 mr-1" />
                       {filters.minRating}+ রেটিং
                       <button
@@ -818,7 +818,7 @@ export default function BooksPageContent() {
                   )}
 
                   {(filters.minPrice || filters.maxPrice) && (
-                    <span className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+                    <span className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)]">
                       <DollarSign className="w-3 h-3 mr-1" />
                       {filters.minPrice || "০"} - {filters.maxPrice || "∞"} টাকা
                       <button
@@ -834,7 +834,7 @@ export default function BooksPageContent() {
                   )}
 
                   {filters.featured && (
-                    <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                    <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)]">
                       <Award className="w-3 h-3 mr-1" />
                       ফিচার্ড
                       <button
@@ -847,7 +847,7 @@ export default function BooksPageContent() {
                   )}
 
                   {filters.bestseller && (
-                    <span className="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm">
+                    <span className="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[clamp(0.75rem,1.5vw,0.875rem)]">
                       <Flame className="w-3 h-3 mr-1" />
                       বেস্টসেলার
                       <button
@@ -865,13 +865,13 @@ export default function BooksPageContent() {
             {/* Results Header */}
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold">
+                <h2 className="text-[clamp(1.25rem,4vw,1.5rem)] font-bold">
                   {isLoading
                     ? "লোড হচ্ছে..."
                     : `${pagination.totalItems || 0} বই পাওয়া গেছে`}
                 </h2>
                 {!isLoading && books.length > 0 && (
-                  <p className="text-gray-600 mt-1">
+                  <p className="text-gray-600 mt-1 text-[clamp(0.875rem,2vw,1rem)]">
                     দেখানো হচ্ছে {(filters.page - 1) * filters.limit + 1} -{" "}
                     {Math.min(
                       filters.page * filters.limit,
@@ -883,18 +883,18 @@ export default function BooksPageContent() {
               </div>
 
               <div className="hidden lg:flex items-center space-x-2">
-                <span className="text-gray-600">ভিউ:</span>
+                <span className="text-gray-600 text-[clamp(0.875rem,2vw,1rem)]">ভিউ:</span>
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`p-2 rounded-lg ${viewMode === "grid" ? "bg-blue-100 text-blue-600" : "bg-gray-100"}`}
                 >
-                  <Grid className="w-5 h-5" />
+                  <Grid className="w-[clamp(1rem,2.5vw,1.25rem)] h-[clamp(1rem,2.5vw,1.25rem)]" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
                   className={`p-2 rounded-lg ${viewMode === "list" ? "bg-blue-100 text-blue-600" : "bg-gray-100"}`}
                 >
-                  <List className="w-5 h-5" />
+                  <List className="w-[clamp(1rem,2.5vw,1.25rem)] h-[clamp(1rem,2.5vw,1.25rem)]" />
                 </button>
               </div>
             </div>
@@ -903,20 +903,20 @@ export default function BooksPageContent() {
             {isLoading && (
               <div className="flex justify-center items-center py-20">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                <span className="ml-3">বইগুলো লোড হচ্ছে...</span>
+                <span className="ml-3 text-[clamp(0.875rem,2.5vw,1rem)]">বইগুলো লোড হচ্ছে...</span>
               </div>
             )}
 
             {/* Error State */}
             {isError && (
               <div className="text-center py-20 bg-white rounded-xl shadow-sm">
-                <div className="text-red-500 mb-4">ত্রুটি হয়েছে</div>
-                <p className="text-gray-600 mb-6">
+                <div className="text-red-500 mb-4 text-[clamp(1rem,3vw,1.125rem)]">ত্রুটি হয়েছে</div>
+                <p className="text-gray-600 mb-6 text-[clamp(0.875rem,2.5vw,1rem)]">
                   বইগুলো লোড করতে সমস্যা হচ্ছে
                 </p>
                 <button
                   onClick={() => refetch()}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-[clamp(0.875rem,2.5vw,1rem)]"
                 >
                   আবার চেষ্টা করুন
                 </button>
@@ -929,26 +929,26 @@ export default function BooksPageContent() {
                 {books.length === 0 ? (
                   <div className="text-center py-20 bg-white rounded-xl shadow-sm">
                     <BookOpen className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                    <h3 className="text-xl font-bold mb-2">
+                    <h3 className="text-[clamp(1.125rem,3vw,1.25rem)] font-bold mb-2">
                       কোন বই পাওয়া যায়নি
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-gray-600 mb-6 text-[clamp(0.875rem,2.5vw,1rem)]">
                       আপনার নির্বাচিত ফিল্টারে কোনো বই নেই
                     </p>
                     <button
                       onClick={clearFilters}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-[clamp(0.875rem,2.5vw,1rem)]"
                     >
                       সব ফিল্টার সরান
                     </button>
                   </div>
                 ) : (
                   <>
-                    {/* Grid Layout - More columns for smaller cards */}
+                    {/* Grid Layout - Responsive columns: 1 on mobile, 2 on sm, 3 on md, 4 on lg */}
                     <div
                       className={
                         viewMode === "grid"
-                          ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+                          ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
                           : "space-y-4"
                       }
                     >
@@ -972,7 +972,7 @@ export default function BooksPageContent() {
                           <button
                             onClick={() => handleFilterChange("page", filters.page - 1)}
                             disabled={filters.page === 1}
-                            className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50"
+                            className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50 text-[clamp(0.875rem,2vw,1rem)]"
                           >
                             পূর্ববর্তী
                           </button>
@@ -997,7 +997,7 @@ export default function BooksPageContent() {
                                 <button
                                   key={pageNum}
                                   onClick={() => handleFilterChange("page", pageNum)}
-                                  className={`px-4 py-2 rounded-lg ${
+                                  className={`px-4 py-2 rounded-lg text-[clamp(0.875rem,2vw,1rem)] ${
                                     filters.page === pageNum
                                       ? "bg-blue-600 text-white"
                                       : "border border-gray-300 hover:bg-gray-50"
@@ -1012,7 +1012,7 @@ export default function BooksPageContent() {
                           <button
                             onClick={() => handleFilterChange("page", filters.page + 1)}
                             disabled={filters.page >= pagination.totalPages}
-                            className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50"
+                            className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50 text-[clamp(0.875rem,2vw,1rem)]"
                           >
                             পরবর্তী
                           </button>
